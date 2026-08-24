@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resources List</title>
+</head>
+<body>
+    <h1>Available Resources</h1>
+
+    <form method="get">
+        <input type="text" name="q" placeholder="Search resources..." value="{{ request.GET.q }}">
+        <button type="submit">Search</button>
+    </form>
+
+    <hr>
+
+    <ul>
+        {% for resource in resources %}
+            <li>
+                <strong>{{ resource.name }}</strong> — ${{ resource.price_per_hour }}/hr
+                (Capacity: {{ resource.capacity }} persons)
+                <br>
+                <small>Category: {{ resource.category.name }}</small>
+                <p>{{ resource.description }}</p>
+            </li>
+        {% empty %}
+            <li>No resources found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

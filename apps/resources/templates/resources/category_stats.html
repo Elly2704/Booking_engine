@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Category Statistics</title>
+</head>
+<body>
+    <h1>Resource Categories Statistics</h1>
+
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>Category Name</th>
+                <th>Total Resources</th>
+                <th>Avg Price Per Hour</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+                <tr>
+                    <td><strong>{{ category.name }}</strong></td>
+                    <td>{{ category.total_resources }}</td>
+                    <td>
+                        {% if category.avg_price %}
+                            ${{ category.avg_price|floatformat:2 }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3">No categories found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
