@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings{% endblock %}
+
+{% block content %}
+<h2>My Bookings</h2>
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Resource</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for booking in bookings %}
+        <tr>
+            <td>{{ booking.resource.name }}</td>
+            <td>{{ booking.start_time|date:"Y-m-d H:i" }}</td>
+            <td>{{ booking.end_time|date:"Y-m-d H:i" }}</td>
+            <td><span class="badge bg-secondary">{{ booking.get_status_display }}</span></td>
+            <td>
+                {% if booking.status != 'cancelled' %}
+                    <a href="{% url 'bookings:booking_cancel' pk=booking.pk %}" class="btn btn-sm btn-outline-danger">Cancel</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No bookings found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

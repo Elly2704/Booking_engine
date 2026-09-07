@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Cancel Booking</h2>
+<p>Are you sure you want to cancel your booking for "{{ object.resource.name }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+    <a href="{% url 'bookings:booking_list' %}" class="btn btn-secondary">Back</a>
+</form>
+{% endblock %}

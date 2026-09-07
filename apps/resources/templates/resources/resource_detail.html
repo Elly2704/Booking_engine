@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>{{ resource.name }}</h2>
+    </div>
+    <div class="card-body">
+        <p><strong>Category:</strong> {{ resource.category.name }}</p>
+        <p><strong>Description:</strong> {{ resource.description }}</p>
+        <p><strong>Price:</strong> ${{ resource.price_per_hour }}/hr</p>
+        <p><strong>Capacity:</strong> {{ resource.capacity }}</p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'bookings:booking_create' slug=resource.slug %}" class="btn btn-success mt-3">Book This Resource</a>
+        {% else %}
+            <p class="text-muted mt-3"><a href="{% url 'users:login' %}">Log in</a> to book this resource.</p>
+        {% endif %}
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'resources:resource_list' %}" class="btn btn-secondary">Back</a>
+    </div>
+</div>
+{% endblock %}
