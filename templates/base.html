@@ -24,6 +24,7 @@
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'bookings:cart_detail' %}">Cart</a></li>
                     {% if user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'bookings:booking_list' %}">My Bookings</a></li>
 
@@ -56,6 +57,12 @@
     </nav>
 
     <div class="container">
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
         {% block content %}{% endblock %}
     </div>
 
