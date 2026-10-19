@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Cancel Booking" %}{% endblock %}
 
 {% block content %}
-<h2>Cancel Booking</h2>
-<p>Are you sure you want to cancel your booking for "{{ object.resource.name }}"?</p>
+<h2>{% translate "Cancel Booking" %}</h2>
+<p>{% blocktranslate with name=object.resource.name %}Are you sure you want to cancel your booking for "{{ name }}"?{% endblocktranslate %}</p>
 <form method="post">
     {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
-    <a href="{% url 'bookings:booking_list' %}" class="btn btn-secondary">Back</a>
+    <button type="submit" class="btn btn-danger">{% translate "Confirm Cancellation" %}</button>
+    <a href="{% url 'bookings:booking_list' %}" class="btn btn-secondary">{% translate "Back" %}</a>
 </form>
 {% endblock %}

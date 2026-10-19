@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Cart" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{% translate "Your Cart" %}</h2>
+    {% if cart|length %}
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>{% translate "Resource" %}</th>
+                <th>{% translate "Hours" %}</th>
+                <th>{% translate "Price / hr" %}</th>
+                <th>{% translate "Total" %}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in cart %}
+            <tr>
+                <td><a href="{% url 'resources:resource_detail' slug=item.resource.slug %}">{{ item.resource.name }}</a></td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ item.price }}</td>
+                <td>${{ item.total_price }}</td>
+                <td>
+                    <form action="{% url 'bookings:cart_remove' item.resource.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">{% translate "Remove" %}</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <p class="fs-5">{% translate "Total:" %} <strong>${{ cart.get_total_price }}</strong></p>
+    <a href="{% url 'resources:resource_list' %}" class="btn btn-secondary">{% translate "Continue Browsing" %}</a>
+    <a href="{% url 'bookings:order_create' %}" class="btn btn-success">{% translate "Checkout" %}</a>
+    {% else %}
+    <p class="mt-3">{% translate "Your cart is empty." %}</p>
+    <a href="{% url 'resources:resource_list' %}" class="btn btn-primary">{% translate "Browse Resources" %}</a>
+    {% endif %}
+</div>
+{% endblock %}

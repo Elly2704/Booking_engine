@@ -1,8 +1,10 @@
+from asgiref.sync import sync_to_async
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.db.models import Q
-from .models import Resource
+from django.db.models import Avg, Count, Q
+from .models import Resource, ResourceCategory
 from .forms import ResourceForm
 
 
@@ -52,3 +54,17 @@ class ResourceDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView
     template_name = 'resources/resource_confirm_delete.html'
     permission_required = 'resources.delete_resource'
     success_url = reverse_lazy('resources:resource_list')
+
+
+async def category_stats(request):
+    categories = [
+        category async for category in ResourceCategory.objects.annotate(
+            total_resources=Count('resources', filter=Q(resources__is_active=True)),
+            avg_price=Avg('resources__price_per_hour', filter=Q(resources__is_active=True)),
+        ).order_by('name')
+    ]
+    total_active = await Resource.objects.filter(is_active=True).acount()
+    return await sync_to_async(render)(request, 'resources/category_stats.html', {
+        'categories': categories,
+        'total_active': total_active,
+    })

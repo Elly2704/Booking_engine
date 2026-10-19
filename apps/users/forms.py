@@ -1,11 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from .models import User
 
 
 class CustomUserCreationForm(UserCreationForm):
-    avatar = forms.ImageField(required=False)
+    avatar = forms.ImageField(label=_('Avatar'), required=False)
 
     class Meta(UserCreationForm.Meta):
         model = User
@@ -20,7 +21,7 @@ class CustomUserCreationForm(UserCreationForm):
         avatar = self.cleaned_data.get('avatar')
         if avatar:
             if avatar.size > 2 * 1024 * 1024:
-                raise ValidationError("File needs to be less then 2 МБ.")
+                raise ValidationError(_("File size must be less than 2 MB."))
         return avatar
 
 

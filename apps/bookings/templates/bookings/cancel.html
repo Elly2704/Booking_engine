@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Payment Cancelled" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4 text-center">
+    <h2 class="text-danger">{% translate "Payment Cancelled" %}</h2>
+    <p class="mt-3">
+        {% if order %}{% blocktranslate with id=order.id %}Order <strong>#{{ id }}</strong> was not paid.{% endblocktranslate %}{% else %}{% translate "Your payment was not completed." %}{% endif %}
+        {% translate "Your cart has been kept, you can try again." %}
+    </p>
+    <a href="{% url 'bookings:cart_detail' %}" class="btn btn-primary mt-3">{% translate "Back to Cart" %}</a>
+</div>
+{% endblock %}

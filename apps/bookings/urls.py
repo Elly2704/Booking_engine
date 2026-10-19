@@ -13,4 +13,7 @@ urlpatterns = [
     path('order/create/', views.order_create, name='order_create'),
     path('payment/success/', views.payment_success, name='payment_success'),
     path('payment/cancel/', views.payment_cancel, name='payment_cancel'),
+    path('availability/<slug:slug>/', views.resource_availability, name='resource_availability'),
+    path('stats/', views.booking_stats, name='booking_stats'),
+    path('orders/<int:pk>/', views.order_detail, name='order_detail'),
 ]

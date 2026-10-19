@@ -1,21 +1,22 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}My Bookings{% endblock %}
+{% block title %}{% translate "My Bookings" %}{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>My Bookings</h2>
-    <a href="{% url 'bookings:cart_detail' %}" class="btn btn-primary">Go to Cart</a>
+    <h2>{% translate "My Bookings" %}</h2>
+    <a href="{% url 'bookings:cart_detail' %}" class="btn btn-primary">{% translate "Go to Cart" %}</a>
 </div>
 
 <table class="table table-striped mt-3">
     <thead>
         <tr>
-            <th>Resource</th>
-            <th>Start Time</th>
-            <th>End Time</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th>{% translate "Resource" %}</th>
+            <th>{% translate "Start Time" %}</th>
+            <th>{% translate "End Time" %}</th>
+            <th>{% translate "Status" %}</th>
+            <th>{% translate "Actions" %}</th>
         </tr>
     </thead>
     <tbody>
@@ -27,51 +28,51 @@
             <td><span class="badge bg-secondary">{{ booking.get_status_display }}</span></td>
             <td>
                 {% if booking.status != 'cancelled' %}
-                    <a href="{% url 'bookings:booking_cancel' pk=booking.pk %}" class="btn btn-sm btn-outline-danger">Cancel</a>
+                    <a href="{% url 'bookings:booking_cancel' pk=booking.pk %}" class="btn btn-sm btn-outline-danger">{% translate "Cancel" %}</a>
                 {% endif %}
             </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="5">No bookings found.</td>
+            <td colspan="5">{% translate "No bookings found." %}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<h2 class="mt-5">My Orders</h2>
+<h2 class="mt-5">{% translate "My Orders" %}</h2>
 <table class="table table-striped mt-3">
     <thead>
         <tr>
-            <th>Order</th>
-            <th>Date</th>
-            <th>Items</th>
-            <th>Total</th>
-            <th>Status</th>
+            <th>{% translate "Order" %}</th>
+            <th>{% translate "Date" %}</th>
+            <th>{% translate "Items" %}</th>
+            <th>{% translate "Total" %}</th>
+            <th>{% translate "Status" %}</th>
         </tr>
     </thead>
     <tbody>
         {% for order in orders %}
         <tr>
-            <td>#{{ order.id }}</td>
+            <td><a href="{% url 'bookings:order_detail' pk=order.pk %}">#{{ order.id }}</a></td>
             <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
             <td>
                 {% for item in order.items.all %}
-                    {{ item.resource.name }} ({{ item.quantity }} h){% if not forloop.last %}<br>{% endif %}
+                    {% blocktranslate with name=item.resource.name hours=item.quantity %}{{ name }} ({{ hours }} h){% endblocktranslate %}{% if not forloop.last %}<br>{% endif %}
                 {% endfor %}
             </td>
             <td>${{ order.get_total_cost }}</td>
             <td>
                 {% if order.paid %}
-                    <span class="badge bg-success">Paid</span>
+                    <span class="badge bg-success">{% translate "Paid" %}</span>
                 {% else %}
-                    <span class="badge bg-warning text-dark">Unpaid</span>
+                    <span class="badge bg-warning text-dark">{% translate "Unpaid" %}</span>
                 {% endif %}
             </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="5">No orders found.</td>
+            <td colspan="5">{% translate "No orders found." %}</td>
         </tr>
         {% endfor %}
     </tbody>

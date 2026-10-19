@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% if object %}{% translate "Edit Resource" %}{% else %}{% translate "Create Resource" %}{% endif %}{% endblock %}
 
 {% block content %}
-<h2>{% if object %}Edit{% else %}Create{% endif %} Resource</h2>
+<h2>{% if object %}{% translate "Edit Resource" %}{% else %}{% translate "Create Resource" %}{% endif %}</h2>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Save</button>
-    <a href="{% url 'resources:resource_list' %}" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-success">{% translate "Save" %}</button>
+    <a href="{% url 'resources:resource_list' %}" class="btn btn-secondary">{% translate "Cancel" %}</a>
 </form>
 {% endblock %}

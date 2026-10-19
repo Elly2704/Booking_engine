@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Book Resource" %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card shadow-sm">
             <div class="card-header bg-primary text-white">
-                <h2 class="mb-0 fs-4">Book Resource</h2>
+                <h2 class="mb-0 fs-4">{% translate "Book Resource" %}</h2>
             </div>
             <div class="card-body">
                 <form method="post" novalidate>
@@ -22,8 +25,8 @@
                     {{ form.as_p }}
 
                     <div class="d-flex justify-content-between mt-4">
-                        <button type="submit" class="btn btn-primary">Confirm Booking</button>
-                        <a href="{% url 'resources:resource_list' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">{% translate "Confirm Booking" %}</button>
+                        <a href="{% url 'resources:resource_list' %}" class="btn btn-secondary">{% translate "Cancel" %}</a>
                     </div>
                 </form>
             </div>

@@ -1,19 +1,20 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Resource List{% endblock %}
+{% block title %}{% translate "Resource List" %}{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Resources</h2>
+    <h2>{% translate "Resources" %}</h2>
     {% if perms.resources.add_resource %}
-        <a href="{% url 'resources:resource_create' %}" class="btn btn-primary">+ Add Resource</a>
+        <a href="{% url 'resources:resource_create' %}" class="btn btn-primary">{% translate "+ Add Resource" %}</a>
     {% endif %}
 </div>
 
 <form method="get" class="mb-4">
     <div class="row g-2">
         <div class="col-md-8">
-            <input type="text" name="q" class="form-control" placeholder="Search..." value="{{ request.GET.q|default:'' }}">
+            <input type="text" name="q" class="form-control" placeholder="{% translate 'Search...' %}" value="{{ request.GET.q|default:'' }}">
         </div>
 
     </div>
@@ -26,21 +27,21 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ resource.name }}</h5>
                     <p class="card-text">{{ resource.description|truncatewords:10 }}</p>
-                    <p class="fw-bold">${{ resource.price_per_hour }}/hr</p>
+                    <p class="fw-bold">{% blocktranslate with price=resource.price_per_hour %}${{ price }}/hr{% endblocktranslate %}</p>
                 </div>
                 <div class="card-footer">
-                    <a href="{% url 'resources:resource_detail' slug=resource.slug %}" class="btn btn-sm btn-info text-white">View</a>
+                    <a href="{% url 'resources:resource_detail' slug=resource.slug %}" class="btn btn-sm btn-info text-white">{% translate "View" %}</a>
                     {% if perms.resources.change_resource %}
-                        <a href="{% url 'resources:resource_update' slug=resource.slug %}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{% url 'resources:resource_update' slug=resource.slug %}" class="btn btn-sm btn-warning">{% translate "Edit" %}</a>
                     {% endif %}
                     {% if perms.resources.delete_resource %}
-                        <a href="{% url 'resources:resource_delete' slug=resource.slug %}" class="btn btn-sm btn-danger">Delete</a>
+                        <a href="{% url 'resources:resource_delete' slug=resource.slug %}" class="btn btn-sm btn-danger">{% translate "Delete" %}</a>
                     {% endif %}
                 </div>
             </div>
         </div>
     {% empty %}
-        <p>No resources available.</p>
+        <p>{% translate "No resources available." %}</p>
     {% endfor %}
 </div>
 
@@ -48,11 +49,11 @@
 <nav class="mt-4">
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">{% translate "Previous" %}</a></li>
         {% endif %}
         <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
         {% if page_obj.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">{% translate "Next" %}</a></li>
         {% endif %}
     </ul>
 </nav>

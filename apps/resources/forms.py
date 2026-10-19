@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from .models import Resource
 
 
@@ -15,3 +16,9 @@ class ResourceForm(forms.ModelForm):
             'capacity': forms.NumberInput(attrs={'class': 'form-control'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+    def clean_price_per_hour(self):
+        price = self.cleaned_data.get('price_per_hour')
+        if price is not None and price <= 0:
+            raise forms.ValidationError(_("Price must be greater than zero."))
+        return price

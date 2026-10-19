@@ -1,0 +1,637 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Booking Engine 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-19 08:15+0000\n"
+"PO-Revision-Date: 2026-10-19 11:20+0000\n"
+"Last-Translator: Elvira\n"
+"Language-Team: Ukrainian\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
+"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
+"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
+"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+
+#: apps/bookings/forms.py:11 apps/bookings/models.py:28
+#: apps/bookings/templates/bookings/booking_list.html:16
+msgid "Start Time"
+msgstr "Час початку"
+
+#: apps/bookings/forms.py:12 apps/bookings/models.py:29
+#: apps/bookings/templates/bookings/booking_list.html:17
+msgid "End Time"
+msgstr "Час завершення"
+
+#: apps/bookings/forms.py:22 apps/bookings/models.py:76
+msgid "First Name"
+msgstr "Ім'я"
+
+#: apps/bookings/forms.py:27 apps/bookings/models.py:77
+msgid "Last Name"
+msgstr "Прізвище"
+
+#: apps/bookings/forms.py:33 apps/bookings/models.py:78
+msgid "Email"
+msgstr "Електронна пошта"
+
+#: apps/bookings/models.py:11
+msgid "Pending"
+msgstr "Очікує"
+
+#: apps/bookings/models.py:12
+msgid "Confirmed"
+msgstr "Підтверджено"
+
+#: apps/bookings/models.py:13
+msgid "Cancelled"
+msgstr "Скасовано"
+
+#: apps/bookings/models.py:20 apps/bookings/models.py:74
+#: apps/users/models.py:12
+msgid "User"
+msgstr "Користувач"
+
+#: apps/bookings/models.py:26 apps/bookings/models.py:109
+#: apps/bookings/templates/bookings/booking_list.html:15
+#: apps/bookings/templates/bookings/cart_detail.html:13
+#: apps/bookings/templates/bookings/order_detail.html:20
+#: apps/resources/models.py:39
+msgid "Resource"
+msgstr "Ресурс"
+
+#: apps/bookings/models.py:30
+#: apps/bookings/templates/bookings/booking_list.html:18
+#: apps/bookings/templates/bookings/booking_list.html:51
+msgid "Status"
+msgstr "Статус"
+
+#: apps/bookings/models.py:31 apps/bookings/models.py:79
+#: apps/resources/models.py:36
+msgid "Created At"
+msgstr "Створено"
+
+#: apps/bookings/models.py:36
+msgid "Booking"
+msgstr "Бронювання"
+
+#: apps/bookings/models.py:37
+msgid "Bookings"
+msgstr "Бронювання"
+
+#: apps/bookings/models.py:46 apps/bookings/views.py:254
+msgid "End time must be greater than start time."
+msgstr "Час завершення має бути пізнішим за час початку."
+
+#: apps/bookings/models.py:49
+msgid "Cannot book resources in the past."
+msgstr "Неможливо забронювати ресурс у минулому."
+
+#: apps/bookings/models.py:61
+msgid "This resource is already booked for the selected time period."
+msgstr "Цей ресурс уже заброньовано на вибраний період."
+
+#: apps/bookings/models.py:80
+msgid "Updated At"
+msgstr "Оновлено"
+
+#: apps/bookings/models.py:81
+#: apps/bookings/templates/bookings/booking_list.html:67
+#: apps/bookings/templates/bookings/order_detail.html:12
+msgid "Paid"
+msgstr "Оплачено"
+
+#: apps/bookings/models.py:82
+msgid "Stripe ID"
+msgstr "Stripe ID"
+
+#: apps/bookings/models.py:86 apps/bookings/models.py:101
+#: apps/bookings/templates/bookings/booking_list.html:47
+msgid "Order"
+msgstr "Замовлення"
+
+#: apps/bookings/models.py:87
+msgid "Orders"
+msgstr "Замовлення"
+
+#: apps/bookings/models.py:90
+#, python-format
+msgid "Order %(id)s"
+msgstr "Замовлення %(id)s"
+
+#: apps/bookings/models.py:111
+msgid "Price"
+msgstr "Ціна"
+
+#: apps/bookings/models.py:112
+msgid "Quantity"
+msgstr "Кількість"
+
+#: apps/bookings/models.py:115
+msgid "Order Item"
+msgstr "Позиція замовлення"
+
+#: apps/bookings/models.py:116
+msgid "Order Items"
+msgstr "Позиції замовлення"
+
+#: apps/bookings/templates/bookings/booking_confirm_cancel.html:4
+#: apps/bookings/templates/bookings/booking_confirm_cancel.html:7
+msgid "Cancel Booking"
+msgstr "Скасування бронювання"
+
+#: apps/bookings/templates/bookings/booking_confirm_cancel.html:8
+#, python-format
+msgid "Are you sure you want to cancel your booking for \"%(name)s\"?"
+msgstr "Ви впевнені, що хочете скасувати бронювання «%(name)s»?"
+
+#: apps/bookings/templates/bookings/booking_confirm_cancel.html:11
+msgid "Confirm Cancellation"
+msgstr "Підтвердити скасування"
+
+#: apps/bookings/templates/bookings/booking_confirm_cancel.html:12
+#: apps/bookings/templates/bookings/order_detail.html:38
+#: apps/resources/templates/resources/resource_detail.html:31
+msgid "Back"
+msgstr "Назад"
+
+#: apps/bookings/templates/bookings/booking_form.html:4
+#: apps/bookings/templates/bookings/booking_form.html:11
+msgid "Book Resource"
+msgstr "Забронювати ресурс"
+
+#: apps/bookings/templates/bookings/booking_form.html:28
+msgid "Confirm Booking"
+msgstr "Підтвердити бронювання"
+
+#: apps/bookings/templates/bookings/booking_form.html:29
+#: apps/bookings/templates/bookings/booking_list.html:31
+#: apps/resources/templates/resources/resource_confirm_delete.html:12
+#: apps/resources/templates/resources/resource_form.html:12
+msgid "Cancel"
+msgstr "Скасувати"
+
+#: apps/bookings/templates/bookings/booking_list.html:4
+#: apps/bookings/templates/bookings/booking_list.html:8 templates/base.html:33
+msgid "My Bookings"
+msgstr "Мої бронювання"
+
+#: apps/bookings/templates/bookings/booking_list.html:9
+msgid "Go to Cart"
+msgstr "До кошика"
+
+#: apps/bookings/templates/bookings/booking_list.html:19
+msgid "Actions"
+msgstr "Дії"
+
+#: apps/bookings/templates/bookings/booking_list.html:37
+msgid "No bookings found."
+msgstr "Бронювань не знайдено."
+
+#: apps/bookings/templates/bookings/booking_list.html:43
+msgid "My Orders"
+msgstr "Мої замовлення"
+
+#: apps/bookings/templates/bookings/booking_list.html:48
+msgid "Date"
+msgstr "Дата"
+
+#: apps/bookings/templates/bookings/booking_list.html:49
+msgid "Items"
+msgstr "Позиції"
+
+#: apps/bookings/templates/bookings/booking_list.html:50
+#: apps/bookings/templates/bookings/cart_detail.html:16
+#: apps/bookings/templates/bookings/order_detail.html:23
+msgid "Total"
+msgstr "Сума"
+
+#: apps/bookings/templates/bookings/booking_list.html:61
+#, python-format
+msgid "%(name)s (%(hours)s h)"
+msgstr "%(name)s (%(hours)s год)"
+
+#: apps/bookings/templates/bookings/booking_list.html:69
+#: apps/bookings/templates/bookings/order_detail.html:14
+msgid "Unpaid"
+msgstr "Не оплачено"
+
+#: apps/bookings/templates/bookings/booking_list.html:75
+msgid "No orders found."
+msgstr "Замовлень не знайдено."
+
+#: apps/bookings/templates/bookings/cancel.html:4
+#: apps/bookings/templates/bookings/cancel.html:8
+msgid "Payment Cancelled"
+msgstr "Оплату скасовано"
+
+#: apps/bookings/templates/bookings/cancel.html:10
+#, python-format
+msgid "Order <strong>#%(id)s</strong> was not paid."
+msgstr "Замовлення <strong>#%(id)s</strong> не оплачено."
+
+#: apps/bookings/templates/bookings/cancel.html:10
+msgid "Your payment was not completed."
+msgstr "Вашу оплату не завершено."
+
+#: apps/bookings/templates/bookings/cancel.html:11
+msgid "Your cart has been kept, you can try again."
+msgstr "Ваш кошик збережено, ви можете спробувати ще раз."
+
+#: apps/bookings/templates/bookings/cancel.html:13
+msgid "Back to Cart"
+msgstr "Повернутися до кошика"
+
+#: apps/bookings/templates/bookings/cart_detail.html:4 templates/base.html:31
+msgid "Cart"
+msgstr "Кошик"
+
+#: apps/bookings/templates/bookings/cart_detail.html:8
+msgid "Your Cart"
+msgstr "Ваш кошик"
+
+#: apps/bookings/templates/bookings/cart_detail.html:14
+#: apps/bookings/templates/bookings/order_detail.html:21
+msgid "Hours"
+msgstr "Години"
+
+#: apps/bookings/templates/bookings/cart_detail.html:15
+#: apps/bookings/templates/bookings/order_detail.html:22
+msgid "Price / hr"
+msgstr "Ціна / год"
+
+#: apps/bookings/templates/bookings/cart_detail.html:30
+msgid "Remove"
+msgstr "Видалити"
+
+#: apps/bookings/templates/bookings/cart_detail.html:37
+#: apps/bookings/templates/bookings/order_create.html:30
+#: apps/bookings/templates/bookings/order_detail.html:37
+#: apps/bookings/templates/bookings/success.html:19
+msgid "Total:"
+msgstr "Разом:"
+
+#: apps/bookings/templates/bookings/cart_detail.html:38
+msgid "Continue Browsing"
+msgstr "Продовжити перегляд"
+
+#: apps/bookings/templates/bookings/cart_detail.html:39
+#: apps/bookings/templates/bookings/order_create.html:4
+#: apps/bookings/templates/bookings/order_create.html:8
+msgid "Checkout"
+msgstr "Оформлення замовлення"
+
+#: apps/bookings/templates/bookings/cart_detail.html:41
+#: apps/bookings/views.py:123
+msgid "Your cart is empty."
+msgstr "Ваш кошик порожній."
+
+#: apps/bookings/templates/bookings/cart_detail.html:42
+msgid "Browse Resources"
+msgstr "Переглянути ресурси"
+
+#: apps/bookings/templates/bookings/order_create.html:21
+msgid "Your Order"
+msgstr "Ваше замовлення"
+
+#: apps/bookings/templates/bookings/order_create.html:32
+msgid "Pay with Stripe"
+msgstr "Оплатити через Stripe"
+
+#: apps/bookings/templates/bookings/order_detail.html:4
+#: apps/bookings/templates/bookings/order_detail.html:8
+#: apps/bookings/views.py:83
+#, python-format
+msgid "Order #%(id)s"
+msgstr "Замовлення #%(id)s"
+
+#: apps/bookings/templates/bookings/success.html:4
+#: apps/bookings/templates/bookings/success.html:8
+msgid "Payment Successful"
+msgstr "Оплата успішна"
+
+#: apps/bookings/templates/bookings/success.html:10
+#, python-format
+msgid "Thank you, %(name)s! Order <strong>#%(id)s</strong> has been paid."
+msgstr "Дякуємо, %(name)s! Замовлення <strong>#%(id)s</strong> оплачено."
+
+#: apps/bookings/templates/bookings/success.html:20
+#, python-format
+msgid "A confirmation email has been sent to %(email)s."
+msgstr "Лист із підтвердженням надіслано на %(email)s."
+
+#: apps/bookings/templates/bookings/success.html:22
+msgid "Back to Resources"
+msgstr "Повернутися до ресурсів"
+
+#: apps/bookings/views.py:85
+#, python-format
+msgid ""
+"Hello, %(name)s!\n"
+"\n"
+"Your payment for order #%(id)s was successful.\n"
+"Thank you for using our booking service!"
+msgstr ""
+"Вітаємо, %(name)s!\n"
+"\n"
+"Оплата замовлення #%(id)s пройшла успішно.\n"
+"Дякуємо, що користуєтеся нашим сервісом бронювання!"
+
+#: apps/bookings/views.py:105
+#, python-format
+msgid "\"%(name)s\" added to cart."
+msgstr "«%(name)s» додано до кошика."
+
+#: apps/bookings/views.py:195
+#, python-format
+msgid "Payment error: %(error)s"
+msgstr "Помилка оплати: %(error)s"
+
+#: apps/bookings/views.py:198
+msgid "Could not create order. Please try again."
+msgstr "Не вдалося створити замовлення. Спробуйте ще раз."
+
+#: apps/bookings/views.py:216
+msgid "Could not verify payment."
+msgstr "Не вдалося перевірити оплату."
+
+#: apps/bookings/views.py:220
+msgid "Payment has not been completed yet."
+msgstr "Оплату ще не завершено."
+
+#: apps/bookings/views.py:243
+msgid "Resource not found."
+msgstr "Ресурс не знайдено."
+
+#: apps/bookings/views.py:248
+msgid "Parameters \"start\" and \"end\" are required."
+msgstr "Параметри «start» та «end» обов'язкові."
+
+#: apps/bookings/views.py:303
+msgid "Order not found."
+msgstr "Замовлення не знайдено."
+
+#: apps/resources/forms.py:23
+msgid "Price must be greater than zero."
+msgstr "Ціна має бути більшою за нуль."
+
+#: apps/resources/models.py:6
+#: apps/resources/templates/resources/category_stats.html:13
+msgid "Category Name"
+msgstr "Назва категорії"
+
+#: apps/resources/models.py:7 apps/resources/models.py:27
+msgid "URL Slug"
+msgstr "URL-слаг"
+
+#: apps/resources/models.py:8 apps/resources/models.py:28
+msgid "Description"
+msgstr "Опис"
+
+#: apps/resources/models.py:11
+msgid "Resource Category"
+msgstr "Категорія ресурсу"
+
+#: apps/resources/models.py:12
+msgid "Resource Categories"
+msgstr "Категорії ресурсів"
+
+#: apps/resources/models.py:24
+msgid "Category"
+msgstr "Категорія"
+
+#: apps/resources/models.py:26
+msgid "Resource Name"
+msgstr "Назва ресурсу"
+
+#: apps/resources/models.py:32
+msgid "Price Per Hour"
+msgstr "Ціна за годину"
+
+#: apps/resources/models.py:34
+msgid "Capacity (persons)"
+msgstr "Місткість (осіб)"
+
+#: apps/resources/models.py:35
+msgid "Is Active"
+msgstr "Активний"
+
+#: apps/resources/models.py:40
+#: apps/resources/templates/resources/resource_list.html:8
+#: templates/base.html:19
+msgid "Resources"
+msgstr "Ресурси"
+
+#: apps/resources/templates/resources/category_stats.html:4
+msgid "Category Statistics"
+msgstr "Статистика категорій"
+
+#: apps/resources/templates/resources/category_stats.html:7
+msgid "Resource Categories Statistics"
+msgstr "Статистика категорій ресурсів"
+
+#: apps/resources/templates/resources/category_stats.html:8
+#, python-format
+msgid "%(counter)s active resource in total."
+msgid_plural "%(counter)s active resources in total."
+msgstr[0] "Усього %(counter)s активний ресурс."
+msgstr[1] "Усього %(counter)s активні ресурси."
+msgstr[2] "Усього %(counter)s активних ресурсів."
+msgstr[3] "Усього %(counter)s активних ресурсів."
+
+#: apps/resources/templates/resources/category_stats.html:14
+msgid "Total Resources"
+msgstr "Усього ресурсів"
+
+#: apps/resources/templates/resources/category_stats.html:15
+msgid "Avg Price Per Hour"
+msgstr "Середня ціна за годину"
+
+#: apps/resources/templates/resources/category_stats.html:27
+msgid "N/A"
+msgstr "Н/Д"
+
+#: apps/resources/templates/resources/category_stats.html:33
+msgid "No categories found."
+msgstr "Категорій не знайдено."
+
+#: apps/resources/templates/resources/resource_confirm_delete.html:4
+#: apps/resources/templates/resources/resource_confirm_delete.html:7
+msgid "Delete Resource"
+msgstr "Видалення ресурсу"
+
+#: apps/resources/templates/resources/resource_confirm_delete.html:8
+#, python-format
+msgid "Are you sure you want to delete \"%(name)s\"?"
+msgstr "Ви впевнені, що хочете видалити «%(name)s»?"
+
+#: apps/resources/templates/resources/resource_confirm_delete.html:11
+msgid "Confirm"
+msgstr "Підтвердити"
+
+#: apps/resources/templates/resources/resource_detail.html:12
+msgid "Category:"
+msgstr "Категорія:"
+
+#: apps/resources/templates/resources/resource_detail.html:13
+msgid "Description:"
+msgstr "Опис:"
+
+#: apps/resources/templates/resources/resource_detail.html:14
+msgid "Price:"
+msgstr "Ціна:"
+
+#: apps/resources/templates/resources/resource_detail.html:14
+#: apps/resources/templates/resources/resource_list.html:30
+#, python-format
+msgid "$%(price)s/hr"
+msgstr "$%(price)s/год"
+
+#: apps/resources/templates/resources/resource_detail.html:15
+msgid "Capacity:"
+msgstr "Місткість:"
+
+#: apps/resources/templates/resources/resource_detail.html:17
+msgid "Book This Resource"
+msgstr "Забронювати цей ресурс"
+
+#: apps/resources/templates/resources/resource_detail.html:21
+msgid "Hours:"
+msgstr "Години:"
+
+#: apps/resources/templates/resources/resource_detail.html:23
+msgid "Add to Cart"
+msgstr "Додати до кошика"
+
+#: apps/resources/templates/resources/resource_detail.html:27
+#, python-format
+msgid "<a href=\"%(login_url)s\">Log in</a> to book this resource."
+msgstr "<a href=\"%(login_url)s\">Увійдіть</a>, щоб забронювати цей ресурс."
+
+#: apps/resources/templates/resources/resource_form.html:4
+#: apps/resources/templates/resources/resource_form.html:7
+msgid "Edit Resource"
+msgstr "Редагування ресурсу"
+
+#: apps/resources/templates/resources/resource_form.html:4
+#: apps/resources/templates/resources/resource_form.html:7
+msgid "Create Resource"
+msgstr "Створення ресурсу"
+
+#: apps/resources/templates/resources/resource_form.html:11
+msgid "Save"
+msgstr "Зберегти"
+
+#: apps/resources/templates/resources/resource_list.html:4
+msgid "Resource List"
+msgstr "Список ресурсів"
+
+#: apps/resources/templates/resources/resource_list.html:10
+#: templates/base.html:26
+msgid "+ Add Resource"
+msgstr "+ Додати ресурс"
+
+#: apps/resources/templates/resources/resource_list.html:17
+msgid "Search..."
+msgstr "Пошук..."
+
+#: apps/resources/templates/resources/resource_list.html:33
+msgid "View"
+msgstr "Переглянути"
+
+#: apps/resources/templates/resources/resource_list.html:35
+msgid "Edit"
+msgstr "Редагувати"
+
+#: apps/resources/templates/resources/resource_list.html:38
+msgid "Delete"
+msgstr "Видалити"
+
+#: apps/resources/templates/resources/resource_list.html:44
+msgid "No resources available."
+msgstr "Немає доступних ресурсів."
+
+#: apps/resources/templates/resources/resource_list.html:52
+msgid "Previous"
+msgstr "Попередня"
+
+#: apps/resources/templates/resources/resource_list.html:56
+msgid "Next"
+msgstr "Наступна"
+
+#: apps/users/admin.py:12 apps/users/admin.py:15
+msgid "Additional Info"
+msgstr "Додаткова інформація"
+
+#: apps/users/forms.py:9 apps/users/models.py:8
+msgid "Avatar"
+msgstr "Аватар"
+
+#: apps/users/forms.py:24
+msgid "File size must be less than 2 MB."
+msgstr "Розмір файлу має бути меншим за 2 МБ."
+
+#: apps/users/models.py:7
+msgid "Phone"
+msgstr "Телефон"
+
+#: apps/users/models.py:13
+msgid "Users"
+msgstr "Користувачі"
+
+#: apps/users/templates/users/login.html:4
+#: apps/users/templates/users/login.html:9
+#: apps/users/templates/users/login.html:13 templates/base.html:55
+msgid "Log In"
+msgstr "Увійти"
+
+#: apps/users/templates/users/profile.html:4
+#: apps/users/templates/users/profile.html:10
+msgid "Edit Profile"
+msgstr "Редагування профілю"
+
+#: apps/users/templates/users/profile.html:15
+msgid "Save Changes"
+msgstr "Зберегти зміни"
+
+#: apps/users/templates/users/register.html:4
+#: apps/users/templates/users/register.html:9
+#: apps/users/templates/users/register.html:13 templates/base.html:56
+msgid "Register"
+msgstr "Реєстрація"
+
+#: config/settings.py:87
+msgid "Ukrainian"
+msgstr "Українська"
+
+#: config/settings.py:88
+msgid "English"
+msgstr "Англійська"
+
+#: templates/base.html:8 templates/base.html:15
+msgid "Booking Engine"
+msgstr "Система бронювання"
+
+#: templates/base.html:22
+msgid "Statistics"
+msgstr "Статистика"
+
+#: templates/base.html:51
+msgid "Log Out"
+msgstr "Вийти"
+
+#: templates/base.html:62
+msgid "Language"
+msgstr "Мова"
+
+#: templates/base.html:80
+
+msgid "Close"
+msgstr "Закрити"

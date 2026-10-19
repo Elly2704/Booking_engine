@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Delete Resource" %}{% endblock %}
 
 {% block content %}
-<h2>Delete Resource</h2>
-<p>Are you sure you want to delete "{{ object.name }}"?</p>
+<h2>{% translate "Delete Resource" %}</h2>
+<p>{% blocktranslate with name=object.name %}Are you sure you want to delete "{{ name }}"?{% endblocktranslate %}</p>
 <form method="post">
     {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Confirm</button>
-    <a href="{% url 'resources:resource_list' %}" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-danger">{% translate "Confirm" %}</button>
+    <a href="{% url 'resources:resource_list' %}" class="btn btn-secondary">{% translate "Cancel" %}</a>
 </form>
 {% endblock %}

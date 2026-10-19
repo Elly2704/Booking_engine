@@ -1,4 +1,11 @@
-echo "__pycache__/" >> .gitignore
-echo "*.pyc" >> .gitignore
-echo ".venv/" >> .gitignore
-echo "db.sqlite3" >> .gitignore
+__pycache__/
+*.pyc
+.venv/
+db.sqlite3
+.env
+debug.log
+media/
+.coverage
+htmlcov/
+.pytest_cache/
+.idea/

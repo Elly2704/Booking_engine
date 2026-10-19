@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktranslate with id=order.id %}Order #{{ id }}{% endblocktranslate %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{% blocktranslate with id=order.id %}Order #{{ id }}{% endblocktranslate %}</h2>
+    <p class="text-muted">{{ order.created_at|date:"Y-m-d H:i" }} &middot; {{ order.first_name }} {{ order.last_name }} &middot; {{ order.email }}</p>
+    <p>
+        {% if order.paid %}
+            <span class="badge bg-success">{% translate "Paid" %}</span>
+        {% else %}
+            <span class="badge bg-warning text-dark">{% translate "Unpaid" %}</span>
+        {% endif %}
+    </p>
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>{% translate "Resource" %}</th>
+                <th>{% translate "Hours" %}</th>
+                <th>{% translate "Price / hr" %}</th>
+                <th>{% translate "Total" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>{{ item.resource.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ item.price }}</td>
+                <td>${{ item.get_cost }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <p class="fs-5">{% translate "Total:" %} <strong>${{ total }}</strong></p>
+    <a href="{% url 'bookings:booking_list' %}" class="btn btn-secondary">{% translate "Back" %}</a>
+</div>
+{% endblock %}
