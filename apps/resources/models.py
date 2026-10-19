@@ -41,4 +41,4 @@ class Resource(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.name} ({self.capacity} capacity)"
+        return self.name

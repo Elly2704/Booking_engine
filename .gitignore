@@ -1,11 +1,10 @@
 __pycache__/
 *.pyc
 .venv/
-db.sqlite3
-.env
-debug.log
-media/
-.coverage
-htmlcov/
-.pytest_cache/
 .idea/
+.env
+db.sqlite3
+media/
+htmlcov/
+.coverage
+.pytest_cache/

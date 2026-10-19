@@ -1,0 +1,15 @@
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings_test"
+python_files = ["test_*.py"]
+testpaths = ["tests"]
+addopts = "--cov --cov-report=term-missing:skip-covered --cov-fail-under=70"
+
+[tool.coverage.run]
+branch = true
+source = ["apps", "config"]
+omit = [
+    "*/migrations/*",
+    "config/asgi.py",
+    "config/wsgi.py",
+    "config/settings_test.py",
+]

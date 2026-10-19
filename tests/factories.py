@@ -9,6 +9,12 @@ from apps.resources.models import Resource, ResourceCategory
 from apps.users.models import User
 
 
+TINY_GIF = (
+    b'GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,'
+    b'\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;'
+)
+
+
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = User
@@ -52,7 +58,7 @@ class BookingFactory(factory.django.DjangoModelFactory):
     resource = factory.SubFactory(ResourceFactory)
     start_time = factory.LazyFunction(lambda: timezone.now() + timedelta(days=1))
     end_time = factory.LazyAttribute(lambda o: o.start_time + timedelta(hours=2))
-    status = 'pending'
+    status = Booking.Status.PENDING
 
 
 class OrderFactory(factory.django.DjangoModelFactory):

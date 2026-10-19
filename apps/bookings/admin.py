@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import Booking, Order, OrderItem
 
 
@@ -7,6 +8,7 @@ class BookingAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'resource', 'start_time', 'end_time', 'status', 'created_at')
     list_filter = ('status', 'created_at')
     search_fields = ('user__username', 'resource__name')
+    list_select_related = ('user', 'resource')
 
 
 class OrderItemInline(admin.TabularInline):

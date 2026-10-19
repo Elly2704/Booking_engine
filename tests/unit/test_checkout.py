@@ -1,14 +1,11 @@
-from datetime import timedelta
 from decimal import Decimal
 from types import SimpleNamespace
 from unittest import mock
 
 import pytest
 from django.urls import reverse
-from django.utils import timezone
 
-from apps.bookings.models import Booking, Order, OrderItem
-from tests.factories import BookingFactory, UserFactory
+from apps.bookings.models import Order, OrderItem
 
 pytestmark = pytest.mark.django_db
 
@@ -18,42 +15,8 @@ def _checkout(client, resource):
     return client.post(reverse('bookings:order_create'), {'first_name': 'Olena', 'email': 'olena@example.com'})
 
 
-class TestBookingCancelAccess:
-    def _cancel(self, client, booking):
-        return client.post(reverse('bookings:booking_cancel', kwargs={'pk': booking.pk}))
-
-    def test_cannot_cancel_foreign_booking(self, auth_client):
-        foreign = BookingFactory(user=UserFactory())
-        assert self._cancel(auth_client, foreign).status_code == 404
-        foreign.refresh_from_db()
-        assert foreign.status == 'pending'
-
-    def test_cannot_open_foreign_cancel_page(self, auth_client):
-        foreign = BookingFactory(user=UserFactory())
-        assert auth_client.get(reverse('bookings:booking_cancel', kwargs={'pk': foreign.pk})).status_code == 404
-
-    def test_cannot_cancel_twice(self, auth_client, booking):
-        Booking.objects.filter(pk=booking.pk).update(status='cancelled')
-        assert self._cancel(auth_client, booking).status_code == 404
-
-    def test_cannot_cancel_started_booking(self, auth_client, booking):
-        Booking.objects.filter(pk=booking.pk).update(
-            start_time=timezone.now() - timedelta(hours=1),
-            end_time=timezone.now() + timedelta(hours=1),
-        )
-        assert self._cancel(auth_client, booking).status_code == 404
-
-    def test_own_booking_cancel_shows_message(self, auth_client, booking):
-        response = auth_client.post(reverse('bookings:booking_cancel', kwargs={'pk': booking.pk}), follow=True)
-        booking.refresh_from_db()
-        assert booking.status == 'cancelled'
-        assert f'Booking for "{booking.resource.name}" has been cancelled.' in [
-            str(m) for m in response.context['messages']
-        ]
-
-
-class TestOrderCreateFixes:
-    def test_uses_current_price_not_price_from_session(self, client, resource, stripe_session_create):
+class TestOrderCreate:
+    def test_uses_current_database_price(self, client, resource, stripe_session_create):
         client.post(reverse('bookings:cart_add', args=[resource.id]), {'quantity': 2})
         resource.price_per_hour = Decimal('99.90')
         resource.save()
@@ -88,7 +51,7 @@ class TestOrderCreateFixes:
         assert stripe_session_create.call_args.kwargs['line_items'][0]['price_data']['currency'] == 'eur'
 
 
-class TestPaymentSuccessFixes:
+class TestPaymentSuccess:
     def test_concurrent_confirmation_sends_single_email(
         self, client, resource, stripe_session_create, mailoutbox, django_capture_on_commit_callbacks
     ):

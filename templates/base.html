@@ -13,7 +13,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
             <a class="navbar-brand" href="{% url 'resources:resource_list' %}">{% translate "Booking Engine" %}</a>
-            <div class="collapse navbar-collapse">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="{% translate 'Toggle navigation' %}">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="main-nav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'resources:resource_list' %}">{% translate "Resources" %}</a>
@@ -35,9 +38,9 @@
                         <li class="nav-item d-flex align-items-center ms-2 me-2">
                             <a href="{% url 'users:profile' %}" class="d-flex align-items-center text-decoration-none text-white">
                                 {% if user.avatar %}
-                                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="rounded-circle" width="32" height="32" style="object-fit: cover; border: 2px solid #4f46e5;">
+                                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="rounded-circle avatar">
                                 {% else %}
-                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 14px;">
+                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold avatar-placeholder">
                                         {{ user.username|slice:":1"|upper }}
                                     </div>
                                 {% endif %}

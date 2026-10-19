@@ -8,10 +8,10 @@
     <h2 class="text-success">{% translate "Payment Successful" %}</h2>
     {% if order %}
         <p class="mt-3">{% blocktranslate with name=order.first_name id=order.id %}Thank you, {{ name }}! Order <strong>#{{ id }}</strong> has been paid.{% endblocktranslate %}</p>
-        <ul class="list-group mb-3 text-start mx-auto" style="max-width: 500px;">
+        <ul class="list-group mb-3 text-start mx-auto narrow">
         {% for item in order.items.all %}
             <li class="list-group-item d-flex justify-content-between">
-                {{ item.resource.name }} ({{ item.quantity }}x)
+                {{ item.resource.name|default:"—" }} ({{ item.quantity }}x)
                 <span>${{ item.get_cost }}</span>
             </li>
         {% endfor %}

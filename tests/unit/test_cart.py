@@ -57,3 +57,11 @@ def test_iteration_skips_deleted_resources(cart_request, resource):
     cart.add(resource)
     resource.delete()
     assert list(cart) == []
+
+
+def test_prices_follow_database(cart_request, resource):
+    cart = Cart(cart_request)
+    cart.add(resource, quantity=2)
+    resource.price_per_hour = Decimal('40.00')
+    resource.save()
+    assert cart.get_total_price() == Decimal('80.00')

@@ -7,14 +7,9 @@ from django.utils import timezone, translation
 from apps.bookings.forms import BookingForm, CheckoutForm
 from apps.resources.forms import ResourceForm
 from apps.users.forms import CustomUserChangeForm, CustomUserCreationForm
-from tests.factories import ResourceFactory
+from tests.factories import TINY_GIF, ResourceFactory
 
 pytestmark = pytest.mark.django_db
-
-GIF = (
-    b'GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,'
-    b'\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;'
-)
 
 
 def _dt(delta):
@@ -111,12 +106,12 @@ class TestUserForms:
         assert all(f.widget.attrs.get('class') == 'form-control' for f in form.fields.values())
 
     def test_avatar_small_is_accepted(self):
-        avatar = SimpleUploadedFile('a.gif', GIF, content_type='image/gif')
+        avatar = SimpleUploadedFile('a.gif', TINY_GIF, content_type='image/gif')
         form = CustomUserCreationForm(data=self._data(), files={'avatar': avatar})
         assert form.is_valid(), form.errors
 
     def test_avatar_too_large(self):
-        avatar = SimpleUploadedFile('a.gif', GIF + b'\x00' * (3 * 1024 * 1024), content_type='image/gif')
+        avatar = SimpleUploadedFile('a.gif', TINY_GIF + b'\x00' * (3 * 1024 * 1024), content_type='image/gif')
         form = CustomUserCreationForm(data=self._data(), files={'avatar': avatar})
         assert not form.is_valid()
         assert form.errors['avatar'] == ['File size must be less than 2 MB.']

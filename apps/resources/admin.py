@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import ResourceCategory, Resource
+
+from .models import Resource, ResourceCategory
 
 
 class ResourceInline(admin.TabularInline):
@@ -19,16 +20,7 @@ class ResourceCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Resource)
 class ResourceAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'name',
-        'category',
-        'price_per_hour',
-        'capacity',
-        'is_active',
-        'created_at'
-    )
-
+    list_display = ('id', 'name', 'category', 'price_per_hour', 'capacity', 'is_active', 'created_at')
     list_display_links = ('id', 'name')
     list_filter = ('category', 'is_active', 'created_at')
     search_fields = ('name', 'description')

@@ -13,18 +13,29 @@
 
 <form method="get" class="mb-4">
     <div class="row g-2">
-        <div class="col-md-8">
-            <input type="text" name="q" class="form-control" placeholder="{% translate 'Search...' %}" value="{{ request.GET.q|default:'' }}">
+        <div class="col-md-6">
+            <input type="text" name="q" class="form-control" placeholder="{% translate 'Search...' %}" value="{{ request.GET.q }}">
         </div>
-
+        <div class="col-md-4">
+            <select name="category" class="form-select" aria-label="{% translate 'Category' %}">
+                <option value="">{% translate "All categories" %}</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}"{% if request.GET.category == category.id|stringformat:"d" %} selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary">{% translate "Find" %}</button>
+        </div>
     </div>
 </form>
 
 <div class="row">
     {% for resource in resources %}
         <div class="col-md-4 mb-3">
-            <div class="card h-100">
+            <div class="card card-hover h-100">
                 <div class="card-body">
+                    <span class="badge bg-light text-secondary mb-2">{{ resource.category.name }}</span>
                     <h5 class="card-title">{{ resource.name }}</h5>
                     <p class="card-text">{{ resource.description|truncatewords:10 }}</p>
                     <p class="fw-bold">{% blocktranslate with price=resource.price_per_hour %}${{ price }}/hr{% endblocktranslate %}</p>
@@ -49,11 +60,11 @@
 <nav class="mt-4">
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">{% translate "Previous" %}</a></li>
+            <li class="page-item"><a class="page-link" href="?q={{ request.GET.q|urlencode }}&category={{ request.GET.category|urlencode }}&page={{ page_obj.previous_page_number }}">{% translate "Previous" %}</a></li>
         {% endif %}
         <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
         {% if page_obj.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">{% translate "Next" %}</a></li>
+            <li class="page-item"><a class="page-link" href="?q={{ request.GET.q|urlencode }}&category={{ request.GET.category|urlencode }}&page={{ page_obj.next_page_number }}">{% translate "Next" %}</a></li>
         {% endif %}
     </ul>
 </nav>

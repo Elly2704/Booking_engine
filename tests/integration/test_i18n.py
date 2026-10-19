@@ -5,7 +5,7 @@ from django.utils import translation
 
 from apps.bookings.views import send_order_confirmation_email
 
-pytestmark = [pytest.mark.django_db, pytest.mark.integration]
+pytestmark = pytest.mark.django_db
 
 
 def test_languages_configured():

@@ -1,11 +1,14 @@
 import logging
+from datetime import timedelta
 from unittest import mock
 
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 
-from apps.bookings.views import send_order_confirmation_email
-from tests.factories import BookingFactory, OrderFactory, ResourceCategoryFactory, ResourceFactory, UserFactory
+from apps.bookings.emails import send_order_confirmation_email
+from apps.bookings.models import Booking
+from tests.factories import BookingFactory, ResourceCategoryFactory, ResourceFactory, UserFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -139,17 +142,11 @@ class TestConfirmationEmail:
         assert mailoutbox[0].subject == f'Order #{order.id}'
 
     def test_email_failure_is_logged(self, order, caplog):
-        with mock.patch('apps.bookings.views.send_mail', side_effect=ConnectionError('smtp down')) as send:
-            with caplog.at_level(logging.ERROR, logger='apps.bookings.views'):
+        with mock.patch('apps.bookings.emails.send_mail', side_effect=ConnectionError('smtp down')) as send:
+            with caplog.at_level(logging.ERROR, logger='apps.bookings.emails'):
                 send_order_confirmation_email(order)
         send.assert_called_once()
-        assert 'Failed to send email' in caplog.text
-
-
-def test_request_timing_middleware_logs(client, db, caplog):
-    with caplog.at_level(logging.INFO, logger='django'):
-        client.get(reverse('resources:resource_list'))
-    assert 'processed in' in caplog.text
+        assert 'Failed to send confirmation email' in caplog.text
 
 
 def test_profile_requires_login(client, db):
@@ -163,6 +160,75 @@ def test_profile_edits_current_user(client, db):
     assert response.context['object'] == user
 
 
-def test_order_factory_without_user():
-    order = OrderFactory(user=None)
-    assert order.first_name == 'Guest'
+class TestBookingCancelAccess:
+    def _cancel(self, client, booking):
+        return client.post(reverse('bookings:booking_cancel', kwargs={'pk': booking.pk}))
+
+    def test_cannot_cancel_foreign_booking(self, auth_client):
+        foreign = BookingFactory(user=UserFactory())
+        assert self._cancel(auth_client, foreign).status_code == 404
+        foreign.refresh_from_db()
+        assert foreign.status == 'pending'
+
+    def test_cannot_open_foreign_cancel_page(self, auth_client):
+        foreign = BookingFactory(user=UserFactory())
+        assert auth_client.get(reverse('bookings:booking_cancel', kwargs={'pk': foreign.pk})).status_code == 404
+
+    def test_cannot_cancel_twice(self, auth_client, booking):
+        Booking.objects.filter(pk=booking.pk).update(status='cancelled')
+        assert self._cancel(auth_client, booking).status_code == 404
+
+    def test_cannot_cancel_started_booking(self, auth_client, booking):
+        Booking.objects.filter(pk=booking.pk).update(
+            start_time=timezone.now() - timedelta(hours=1),
+            end_time=timezone.now() + timedelta(hours=1),
+        )
+        assert self._cancel(auth_client, booking).status_code == 404
+
+    def test_own_booking_cancel_shows_message(self, auth_client, booking):
+        response = auth_client.post(reverse('bookings:booking_cancel', kwargs={'pk': booking.pk}), follow=True)
+        booking.refresh_from_db()
+        assert booking.status == 'cancelled'
+        assert f'Booking for "{booking.resource.name}" has been cancelled.' in [
+            str(m) for m in response.context['messages']
+        ]
+
+
+class TestInputHardening:
+    def test_booking_list_ignores_invalid_filters(self, auth_client, booking):
+        response = auth_client.get(reverse('bookings:booking_list'), {'status': 'unknown', 'resource': 'abc'})
+        assert response.status_code == 200
+        assert list(response.context['bookings']) == [booking]
+
+    def test_resource_list_ignores_invalid_category(self, client, resource):
+        response = client.get(reverse('resources:resource_list'), {'category': 'abc'})
+        assert list(response.context['resources']) == [resource]
+
+    def test_payment_cancel_ignores_invalid_order_id(self, client, db):
+        response = client.get(reverse('bookings:payment_cancel'), {'order_id': 'abc'})
+        assert response.status_code == 200
+        assert response.context['order'] is None
+
+    def test_inactive_resource_detail_is_404(self, client):
+        resource = ResourceFactory(is_active=False)
+        assert client.get(reverse('resources:resource_detail', kwargs={'slug': resource.slug})).status_code == 404
+
+    def test_inactive_resource_cannot_be_booked(self, auth_client):
+        resource = ResourceFactory(is_active=False)
+        response = auth_client.post(
+            reverse('bookings:booking_create', kwargs={'slug': resource.slug}),
+            {'start_time': '2099-01-01T10:00', 'end_time': '2099-01-01T12:00'},
+        )
+        assert response.status_code == 404
+        assert not Booking.objects.exists()
+
+
+class TestCatalogueContext:
+    def test_categories_available_for_filter(self, client, category):
+        response = client.get(reverse('resources:resource_list'))
+        assert list(response.context['categories']) == [category]
+
+    def test_pagination_keeps_filters(self, client, category):
+        ResourceFactory.create_batch(7, category=category, name='Room')
+        page = client.get(reverse('resources:resource_list'), {'q': 'Room', 'category': category.id}).content.decode()
+        assert f'?q=Room&category={category.id}&page=2' in page

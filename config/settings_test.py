@@ -1,3 +1,7 @@
+import os
+
+os.environ.setdefault('SECRET_KEY', 'test-secret-key')
+
 from .settings import *
 
 DEBUG = False

@@ -11,17 +11,16 @@ from django.utils import timezone
 from apps.bookings.models import Booking, Order
 from apps.resources.models import Resource
 from apps.users.models import User
-from tests.factories import ResourceFactory, UserFactory
-from tests.unit.test_forms import GIF
+from tests.factories import TINY_GIF, ResourceFactory, UserFactory
 
-pytestmark = [pytest.mark.django_db, pytest.mark.integration]
+pytestmark = pytest.mark.django_db
 
 
 def _local(dt):
     return timezone.localtime(dt).strftime('%Y-%m-%dT%H:%M')
 
 
-def _register(client, username='alice', **extra):
+def _register(client, username='alice', follow=False, **extra):
     data = {
         'username': username,
         'email': f'{username}@example.com',
@@ -30,7 +29,7 @@ def _register(client, username='alice', **extra):
         'password2': 'VeryStrongPass987',
     }
     data.update(extra)
-    return client.post(reverse('users:register'), data)
+    return client.post(reverse('users:register'), data, follow=follow)
 
 
 def _login(client, username, password='VeryStrongPass987'):
@@ -53,9 +52,9 @@ def _checkout(client, resource, quantity=2, **data):
 
 class TestAccountFlows:
     def test_register_login_and_see_username(self, client):
-        response = _register(client)
-        assert response.status_code == 302
-        assert response.url == reverse('users:login')
+        response = _register(client, follow=True)
+        assert response.redirect_chain[-1][0] == reverse('users:login')
+        assert 'Your account has been created. You can log in now.' in response.content.decode()
 
         response = _login(client, 'alice')
         assert response.url == reverse('resources:resource_list')
@@ -65,7 +64,7 @@ class TestAccountFlows:
         assert 'Log Out' in page
 
     def test_register_with_avatar(self, client):
-        avatar = SimpleUploadedFile('me.gif', GIF, content_type='image/gif')
+        avatar = SimpleUploadedFile('me.gif', TINY_GIF, content_type='image/gif')
         _register(client, 'bob', avatar=avatar)
         user = User.objects.get(username='bob')
         assert user.avatar.name.startswith('avatars/')
@@ -89,8 +88,9 @@ class TestAccountFlows:
 
         response = client.post(reverse('users:profile'), {
             'username': 'dave', 'email': 'dave.new@example.com', 'phone': '+380000000000',
-        })
-        assert response.status_code == 302
+        }, follow=True)
+        assert response.redirect_chain[-1][0] == reverse('users:profile')
+        assert 'Profile updated.' in response.content.decode()
         user.refresh_from_db()
         assert user.email == 'dave.new@example.com'
 
