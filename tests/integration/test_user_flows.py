@@ -169,15 +169,17 @@ class TestCheckoutFlows:
         assert kwargs['client_reference_id'] == str(order.id)
 
     def test_full_paid_flow_sends_email_and_clears_cart(
-        self, auth_client, user, resource, stripe_session_create, stripe_session_retrieve, mailoutbox
+        self, auth_client, user, resource, stripe_session_create, stripe_session_retrieve, mailoutbox,
+        django_capture_on_commit_callbacks,
     ):
         _checkout(auth_client, resource)
         order = Order.objects.get()
         assert order.user == user
 
-        response = auth_client.get(reverse('bookings:payment_success'), {
-            'order_id': order.id, 'session_id': order.stripe_id,
-        })
+        with django_capture_on_commit_callbacks(execute=True):
+            response = auth_client.get(reverse('bookings:payment_success'), {
+                'order_id': order.id, 'session_id': order.stripe_id,
+            })
 
         assert response.status_code == 200
         assert 'Payment Successful' in response.content.decode()
@@ -194,14 +196,16 @@ class TestCheckoutFlows:
         assert 'Paid' in detail.content.decode()
 
     def test_success_page_is_idempotent(
-        self, client, resource, stripe_session_create, stripe_session_retrieve, mailoutbox
+        self, client, resource, stripe_session_create, stripe_session_retrieve, mailoutbox,
+        django_capture_on_commit_callbacks,
     ):
         _checkout(client, resource)
         order = Order.objects.get()
         params = {'order_id': order.id, 'session_id': order.stripe_id}
 
-        client.get(reverse('bookings:payment_success'), params)
-        client.get(reverse('bookings:payment_success'), params)
+        with django_capture_on_commit_callbacks(execute=True):
+            client.get(reverse('bookings:payment_success'), params)
+            client.get(reverse('bookings:payment_success'), params)
 
         assert stripe_session_retrieve.call_count == 1
         assert len(mailoutbox) == 1

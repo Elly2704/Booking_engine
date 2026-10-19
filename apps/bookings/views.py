@@ -29,6 +29,11 @@ logger = logging.getLogger(__name__)
 
 
 class BookingListView(LoginRequiredMixin, ListView):
+    """Show the current user's bookings and orders.
+
+    Supports optional ``?status=`` and ``?resource=`` query filters.
+    Orders are prefetched with their items and resources to avoid N+1 queries.
+    """
     model = Booking
     template_name = 'bookings/booking_list.html'
     context_object_name = 'bookings'
@@ -52,6 +57,11 @@ class BookingListView(LoginRequiredMixin, ListView):
 
 
 class BookingCreateView(LoginRequiredMixin, CreateView):
+    """Create a booking for the resource identified by ``slug``.
+
+    The user and resource are attached in ``form_valid``; model-level validation
+    (past dates, overlaps) is surfaced as a non-field form error.
+    """
     model = Booking
     form_class = BookingForm
     template_name = 'bookings/booking_form.html'
@@ -69,17 +79,38 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
 
 
 class BookingCancelView(LoginRequiredMixin, UpdateView):
+    """Cancel one of the current user's upcoming bookings.
+
+    GET renders a confirmation page, POST sets the status to ``cancelled``.
+    Only the owner's future, not yet cancelled bookings are reachable; anything
+    else returns 404, so other users' bookings cannot be cancelled by ``pk``.
+    """
     model = Booking
     fields = []
     template_name = 'bookings/booking_confirm_cancel.html'
     success_url = reverse_lazy('bookings:booking_list')
 
+    def get_queryset(self):
+        return Booking.objects.filter(
+            user=self.request.user,
+            start_time__gt=timezone.now(),
+        ).exclude(status='cancelled').select_related('resource')
+
     def form_valid(self, form):
         form.instance.status = 'cancelled'
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        messages.success(self.request, _('Booking for "%(name)s" has been cancelled.') % {
+            'name': self.object.resource.name,
+        })
+        return response
 
 
 def send_order_confirmation_email(order):
+    """Send a payment confirmation email for ``order``.
+
+    The text is translated into the active language. SMTP errors are logged and
+    swallowed so a mail outage never breaks the payment flow.
+    """
     subject = _('Order #%(id)s') % {'id': order.id}
     message = _(
         'Hello, %(name)s!\n\nYour payment for order #%(id)s was successful.\n'
@@ -96,6 +127,10 @@ def send_order_confirmation_email(order):
 
 @require_POST
 def cart_add(request, resource_id):
+    """Add ``quantity`` hours of an active resource to the session cart (POST only).
+
+    Invalid or missing quantity falls back to 1. Redirects to the cart page.
+    """
     resource = get_object_or_404(Resource, id=resource_id, is_active=True)
     try:
         quantity = max(1, int(request.POST.get('quantity', 1)))
@@ -108,16 +143,25 @@ def cart_add(request, resource_id):
 
 @require_POST
 def cart_remove(request, resource_id):
+    """Remove a resource from the session cart (POST only) and redirect to the cart."""
     resource = get_object_or_404(Resource, id=resource_id)
     Cart(request).remove(resource)
     return redirect('bookings:cart_detail')
 
 
 def cart_detail(request):
+    """Render the session cart with line totals and the overall price."""
     return render(request, 'bookings/cart_detail.html', {'cart': Cart(request)})
 
 
 def order_create(request):
+    """Checkout: validate contact data, create the order and redirect to Stripe.
+
+    Prices are taken from the database at checkout time, not from the session,
+    and checkout is refused if a cart item has been deactivated. The order, its
+    items and the Stripe Checkout Session are created in one transaction, so a
+    Stripe error leaves no orphan order. Responds with a 303 redirect to Stripe.
+    """
     cart = Cart(request)
     if len(cart) == 0:
         messages.warning(request, _('Your cart is empty.'))
@@ -137,6 +181,13 @@ def order_create(request):
         last_name = form.cleaned_data['last_name']
         email = form.cleaned_data['email']
 
+        inactive = [item['resource'].name for item in cart if not item['resource'].is_active]
+        if inactive:
+            messages.error(request, _('These resources are no longer available: %(names)s') % {
+                'names': ', '.join(inactive),
+            })
+            return redirect('bookings:cart_detail')
+
         try:
             with transaction.atomic():
                 order = Order.objects.create(
@@ -150,7 +201,7 @@ def order_create(request):
                 for item in cart:
                     resource = item['resource']
                     quantity = item['quantity']
-                    price = item['price']
+                    price = resource.price_per_hour
 
                     OrderItem.objects.create(
                         order=order,
@@ -161,7 +212,7 @@ def order_create(request):
 
                     line_items.append({
                         'price_data': {
-                            'currency': 'usd',
+                            'currency': settings.STRIPE_CURRENCY,
                             'unit_amount': int(price * 100),
                             'product_data': {
                                 'name': resource.name,
@@ -201,6 +252,13 @@ def order_create(request):
 
 
 def payment_success(request):
+    """Handle the Stripe success redirect and mark the order as paid.
+
+    The order is looked up by both ``order_id`` and ``session_id``. Payment status
+    is verified with Stripe, then the order row is locked with
+    ``select_for_update`` so concurrent requests cannot confirm it twice. The
+    confirmation email is sent only after the transaction commits.
+    """
     order_id = request.GET.get('order_id')
     session_id = request.GET.get('session_id')
     if not (order_id and session_id):
@@ -220,15 +278,19 @@ def payment_success(request):
             messages.warning(request, _('Payment has not been completed yet.'))
             return render(request, 'bookings/cancel.html', {'order': order})
 
-        order.paid = True
-        order.save()
+        with transaction.atomic():
+            order = Order.objects.select_for_update().get(pk=order.pk)
+            if not order.paid:
+                order.paid = True
+                order.save(update_fields=['paid', 'updated_at'])
+                transaction.on_commit(lambda: send_order_confirmation_email(order))
         Cart(request).clear()
-        send_order_confirmation_email(order)
 
     return render(request, 'bookings/success.html', {'order': order})
 
 
 def payment_cancel(request):
+    """Render the cancelled-payment page; the cart is kept so the user can retry."""
     order = None
     order_id = request.GET.get('order_id')
     if order_id:
@@ -238,6 +300,12 @@ def payment_cancel(request):
 
 @require_GET
 async def resource_availability(request, slug):
+    """Async JSON API: check whether a resource is free for a time range.
+
+    Query params ``start`` and ``end`` are ISO datetimes (naive values are treated
+    as the current time zone). Returns ``{"available": bool, ...}``, 400 for bad
+    input and 404 for an unknown or inactive resource.
+    """
     resource = await Resource.objects.filter(slug=slug, is_active=True).afirst()
     if resource is None:
         return JsonResponse({'error': _('Resource not found.')}, status=404)
@@ -271,6 +339,10 @@ async def resource_availability(request, slug):
 @login_required
 @require_GET
 async def booking_stats(request):
+    """Async JSON API: booking counters per status, paid orders and the next 5 bookings.
+
+    Requires authentication; all queries use the async ORM.
+    """
     user = await request.auser()
     stats = await Booking.objects.filter(user=user).aaggregate(
         total=Count('id'),
@@ -297,6 +369,10 @@ async def booking_stats(request):
 
 @login_required
 async def order_detail(request, pk):
+    """Async view: show one of the current user's orders with its items and total.
+
+    Returns 404 for orders that belong to someone else.
+    """
     user = await request.auser()
     order = await Order.objects.filter(pk=pk, user=user).afirst()
     if order is None:

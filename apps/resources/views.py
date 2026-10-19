@@ -9,6 +9,11 @@ from .forms import ResourceForm
 
 
 class ResourceListView(ListView):
+    """Public catalogue of active resources, 6 per page.
+
+    Supports full-text-like search via ``?q=`` (name or description) and
+    filtering by ``?category=<id>``.
+    """
     model = Resource
     template_name = 'resources/resource_list.html'
     context_object_name = 'resources'
@@ -26,12 +31,14 @@ class ResourceListView(ListView):
 
 
 class ResourceDetailView(DetailView):
+    """Public resource page with booking and add-to-cart actions."""
     model = Resource
     template_name = 'resources/resource_detail.html'
     context_object_name = 'resource'
 
 
 class ResourceCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    """Create a resource; requires the ``resources.add_resource`` permission."""
     model = Resource
     form_class = ResourceForm
     template_name = 'resources/resource_form.html'
@@ -40,6 +47,7 @@ class ResourceCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView
 
 
 class ResourceUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    """Edit a resource; requires ``resources.change_resource``. Redirects to its detail page."""
     model = Resource
     form_class = ResourceForm
     template_name = 'resources/resource_form.html'
@@ -50,6 +58,7 @@ class ResourceUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView
 
 
 class ResourceDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    """Delete a resource after confirmation; requires ``resources.delete_resource``."""
     model = Resource
     template_name = 'resources/resource_confirm_delete.html'
     permission_required = 'resources.delete_resource'
@@ -57,6 +66,7 @@ class ResourceDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView
 
 
 async def category_stats(request):
+    """Async view: number of active resources and average hourly price per category."""
     categories = [
         category async for category in ResourceCategory.objects.annotate(
             total_resources=Count('resources', filter=Q(resources__is_active=True)),

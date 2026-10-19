@@ -64,6 +64,10 @@ class Booking(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
+    @property
+    def is_cancellable(self):
+        return self.status != 'cancelled' and self.start_time > timezone.now()
+
 
 class Order(models.Model):
     user = models.ForeignKey(

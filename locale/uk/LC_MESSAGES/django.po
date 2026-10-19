@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Booking Engine 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 08:15+0000\n"
+"POT-Creation-Date: 2026-10-19 08:49+0000\n"
 "PO-Revision-Date: 2026-10-19 11:20+0000\n"
 "Last-Translator: Elvira\n"
 "Language-Team: Ukrainian\n"
@@ -30,15 +30,15 @@ msgstr "Час початку"
 msgid "End Time"
 msgstr "Час завершення"
 
-#: apps/bookings/forms.py:22 apps/bookings/models.py:76
+#: apps/bookings/forms.py:22 apps/bookings/models.py:80
 msgid "First Name"
 msgstr "Ім'я"
 
-#: apps/bookings/forms.py:27 apps/bookings/models.py:77
+#: apps/bookings/forms.py:27 apps/bookings/models.py:81
 msgid "Last Name"
 msgstr "Прізвище"
 
-#: apps/bookings/forms.py:33 apps/bookings/models.py:78
+#: apps/bookings/forms.py:33 apps/bookings/models.py:82
 msgid "Email"
 msgstr "Електронна пошта"
 
@@ -54,12 +54,12 @@ msgstr "Підтверджено"
 msgid "Cancelled"
 msgstr "Скасовано"
 
-#: apps/bookings/models.py:20 apps/bookings/models.py:74
+#: apps/bookings/models.py:20 apps/bookings/models.py:78
 #: apps/users/models.py:12
 msgid "User"
 msgstr "Користувач"
 
-#: apps/bookings/models.py:26 apps/bookings/models.py:109
+#: apps/bookings/models.py:26 apps/bookings/models.py:113
 #: apps/bookings/templates/bookings/booking_list.html:15
 #: apps/bookings/templates/bookings/cart_detail.html:13
 #: apps/bookings/templates/bookings/order_detail.html:20
@@ -73,7 +73,7 @@ msgstr "Ресурс"
 msgid "Status"
 msgstr "Статус"
 
-#: apps/bookings/models.py:31 apps/bookings/models.py:79
+#: apps/bookings/models.py:31 apps/bookings/models.py:83
 #: apps/resources/models.py:36
 msgid "Created At"
 msgstr "Створено"
@@ -86,7 +86,7 @@ msgstr "Бронювання"
 msgid "Bookings"
 msgstr "Бронювання"
 
-#: apps/bookings/models.py:46 apps/bookings/views.py:254
+#: apps/bookings/models.py:46 apps/bookings/views.py:322
 msgid "End time must be greater than start time."
 msgstr "Час завершення має бути пізнішим за час початку."
 
@@ -98,47 +98,47 @@ msgstr "Неможливо забронювати ресурс у минулом
 msgid "This resource is already booked for the selected time period."
 msgstr "Цей ресурс уже заброньовано на вибраний період."
 
-#: apps/bookings/models.py:80
+#: apps/bookings/models.py:84
 msgid "Updated At"
 msgstr "Оновлено"
 
-#: apps/bookings/models.py:81
+#: apps/bookings/models.py:85
 #: apps/bookings/templates/bookings/booking_list.html:67
 #: apps/bookings/templates/bookings/order_detail.html:12
 msgid "Paid"
 msgstr "Оплачено"
 
-#: apps/bookings/models.py:82
+#: apps/bookings/models.py:86
 msgid "Stripe ID"
 msgstr "Stripe ID"
 
-#: apps/bookings/models.py:86 apps/bookings/models.py:101
+#: apps/bookings/models.py:90 apps/bookings/models.py:105
 #: apps/bookings/templates/bookings/booking_list.html:47
 msgid "Order"
 msgstr "Замовлення"
 
-#: apps/bookings/models.py:87
+#: apps/bookings/models.py:91
 msgid "Orders"
 msgstr "Замовлення"
 
-#: apps/bookings/models.py:90
+#: apps/bookings/models.py:94
 #, python-format
 msgid "Order %(id)s"
 msgstr "Замовлення %(id)s"
 
-#: apps/bookings/models.py:111
+#: apps/bookings/models.py:115
 msgid "Price"
 msgstr "Ціна"
 
-#: apps/bookings/models.py:112
+#: apps/bookings/models.py:116
 msgid "Quantity"
 msgstr "Кількість"
 
-#: apps/bookings/models.py:115
+#: apps/bookings/models.py:119
 msgid "Order Item"
 msgstr "Позиція замовлення"
 
-#: apps/bookings/models.py:116
+#: apps/bookings/models.py:120
 msgid "Order Items"
 msgstr "Позиції замовлення"
 
@@ -289,7 +289,7 @@ msgid "Checkout"
 msgstr "Оформлення замовлення"
 
 #: apps/bookings/templates/bookings/cart_detail.html:41
-#: apps/bookings/views.py:123
+#: apps/bookings/views.py:167
 msgid "Your cart is empty."
 msgstr "Ваш кошик порожній."
 
@@ -307,7 +307,7 @@ msgstr "Оплатити через Stripe"
 
 #: apps/bookings/templates/bookings/order_detail.html:4
 #: apps/bookings/templates/bookings/order_detail.html:8
-#: apps/bookings/views.py:83
+#: apps/bookings/views.py:114
 #, python-format
 msgid "Order #%(id)s"
 msgstr "Замовлення #%(id)s"
@@ -331,7 +331,12 @@ msgstr "Лист із підтвердженням надіслано на %(ema
 msgid "Back to Resources"
 msgstr "Повернутися до ресурсів"
 
-#: apps/bookings/views.py:85
+#: apps/bookings/views.py:102
+#, python-format
+msgid "Booking for \"%(name)s\" has been cancelled."
+msgstr "Бронювання «%(name)s» скасовано."
+
+#: apps/bookings/views.py:116
 #, python-format
 msgid ""
 "Hello, %(name)s!\n"
@@ -344,37 +349,42 @@ msgstr ""
 "Оплата замовлення #%(id)s пройшла успішно.\n"
 "Дякуємо, що користуєтеся нашим сервісом бронювання!"
 
-#: apps/bookings/views.py:105
+#: apps/bookings/views.py:140
 #, python-format
 msgid "\"%(name)s\" added to cart."
 msgstr "«%(name)s» додано до кошика."
 
-#: apps/bookings/views.py:195
+#: apps/bookings/views.py:186
+#, python-format
+msgid "These resources are no longer available: %(names)s"
+msgstr "Ці ресурси більше недоступні: %(names)s"
+
+#: apps/bookings/views.py:246
 #, python-format
 msgid "Payment error: %(error)s"
 msgstr "Помилка оплати: %(error)s"
 
-#: apps/bookings/views.py:198
+#: apps/bookings/views.py:249
 msgid "Could not create order. Please try again."
 msgstr "Не вдалося створити замовлення. Спробуйте ще раз."
 
-#: apps/bookings/views.py:216
+#: apps/bookings/views.py:274
 msgid "Could not verify payment."
 msgstr "Не вдалося перевірити оплату."
 
-#: apps/bookings/views.py:220
+#: apps/bookings/views.py:278
 msgid "Payment has not been completed yet."
 msgstr "Оплату ще не завершено."
 
-#: apps/bookings/views.py:243
+#: apps/bookings/views.py:311
 msgid "Resource not found."
 msgstr "Ресурс не знайдено."
 
-#: apps/bookings/views.py:248
+#: apps/bookings/views.py:316
 msgid "Parameters \"start\" and \"end\" are required."
 msgstr "Параметри «start» та «end» обов'язкові."
 
-#: apps/bookings/views.py:303
+#: apps/bookings/views.py:379
 msgid "Order not found."
 msgstr "Замовлення не знайдено."
 
@@ -632,6 +642,5 @@ msgid "Language"
 msgstr "Мова"
 
 #: templates/base.html:80
-
 msgid "Close"
 msgstr "Закрити"
