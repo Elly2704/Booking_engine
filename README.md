@@ -13,7 +13,8 @@ The interface is available in **Ukrainian and English**.
 - **Permissions**: only staff with model permissions can create, edit or delete resources
 - **Async views** using the async ORM: availability check API, booking statistics API, order details, category statistics
 - **Internationalization**: Ukrainian (default) and English with a language switcher
-- **Tests**: 145 pytest tests with ~99% coverage, Stripe and email are mocked
+- **REST API** on Django REST Framework: JWT auth, pagination, filtering, throttling, Swagger docs, CORS
+- **Tests**: 229 pytest tests with ~99% coverage, Stripe and email are mocked
 
 ## Tech stack
 
@@ -22,6 +23,7 @@ The interface is available in **Ukrainian and English**.
 | Backend | Python 3.12, Django 6.1 |
 | Database | PostgreSQL 16 |
 | Payments | Stripe Checkout |
+| API | Django REST Framework, Simple JWT, django-filter, drf-spectacular, django-cors-headers |
 | Frontend | Django templates, Bootstrap 5 |
 | Infrastructure | Docker, Docker Compose |
 | Testing | pytest, pytest-django, pytest-cov, factory-boy |
@@ -64,6 +66,7 @@ python manage.py runserver
 | `SECRET_KEY` | Django secret key | required |
 | `DEBUG` | Debug mode, also enables Django Debug Toolbar | `False` |
 | `ALLOWED_HOSTS` | Comma-separated host list | `localhost,127.0.0.1` |
+| `CORS_ALLOWED_ORIGINS` | Comma-separated origins allowed to call `/api/` | `http://localhost:3000,http://127.0.0.1:3000` |
 | `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` | PostgreSQL connection | `booking_db`, `postgres`, empty, `localhost`, `5432` |
 | `STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY` | Stripe test keys | empty |
 | `STRIPE_CURRENCY` | Checkout currency | `usd` |
@@ -82,6 +85,7 @@ Tests use `config/settings_test.py` (in-memory SQLite, no external services), so
 tests/
 ├── factories.py        factory-boy factories for all models
 ├── conftest.py         shared fixtures and Stripe mocks
+├── api/                REST API: JWT, permissions, filters, throttling, CORS, docs
 ├── unit/               models, forms, cart, views, async views, checkout, seed command
 └── integration/        end-to-end user flows and i18n
 ```
@@ -92,7 +96,8 @@ tests/
 apps/
 ├── users/        custom User model (phone, avatar), registration, profile
 ├── resources/    categories and resources, catalogue, CRUD, statistics
-└── bookings/     bookings, cart, orders, Stripe checkout, emails, async API, seed_data
+├── bookings/     bookings, cart, orders, Stripe checkout, emails, async API, seed_data
+└── api/          REST API: serializers, viewsets, filters, permissions, routes
 config/           settings and URL configuration
 locale/           uk and en translations
 templates/        base layout
@@ -117,6 +122,31 @@ static/           styles
 | `/bookings/availability/<slug>/?start=&end=` | JSON: is the resource free in this period (async) |
 | `/bookings/stats/` | JSON: the current user's booking statistics (async) |
 | `/admin/` | Django admin |
+
+## REST API
+
+Interactive documentation is at `/api/docs/` (Swagger UI), the OpenAPI schema at `/api/schema/`.
+Lists are paginated by 20 items. Throttling: 100 requests/hour for anonymous users, 1000/hour for authenticated ones.
+
+```bash
+curl -X POST localhost:8000/api/auth/token/ -H 'Content-Type: application/json' \
+     -d '{"username": "...", "password": "..."}'
+curl localhost:8000/api/bookings/ -H 'Authorization: Bearer <access>'
+```
+
+| Endpoint | Access | Filters and notes |
+|---|---|---|
+| `POST /api/auth/token/`, `/refresh/`, `/verify/` | public | JWT obtain, refresh, verify |
+| `/api/categories/` | read: public, write: staff | `?slug=`, `?search=`, `?ordering=` |
+| `/api/resources/` | read: public, write: staff | `?category=<slug>`, `?min_price=`, `?max_price=`, `?min_capacity=`, `?is_active=`, `?search=`, `?ordering=` |
+| `/api/bookings/` | owner, staff read-only, delete: staff | `?status=`, `?resource=`, `?start_after=`, `?start_before=` |
+| `POST /api/bookings/<id>/cancel/` | owner | Cancels an upcoming booking |
+| `/api/cart/` | owner | `POST` with an existing resource increases its quantity |
+| `GET /api/cart/summary/`, `DELETE /api/cart/clear/` | owner | Items with totals; empty the cart |
+| `/api/orders/` | owner, staff read-only, delete: staff | `POST` creates an unpaid order from the cart; `?paid=`, `?created_after=`, `?created_before=` |
+| `/api/users/`, `/api/users/me/` | authenticated | Users see only themselves, staff see everyone; `me` supports `PATCH` |
+
+The API cart is stored in the database per user, because JWT clients have no session; it is separate from the session cart of the website.
 
 ## Translations
 

@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -134,3 +135,36 @@ class OrderItem(models.Model):
 
     def get_cost(self):
         return self.price * self.quantity
+
+
+class CartItem(models.Model):
+    """Persistent cart line of the REST API, which is stateless and cannot use the session cart."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='cart_items',
+        verbose_name=_('User'),
+    )
+    resource = models.ForeignKey(
+        Resource,
+        on_delete=models.CASCADE,
+        related_name='cart_items',
+        verbose_name=_('Resource'),
+    )
+    quantity = models.PositiveIntegerField(_('Quantity'), default=1, validators=[MinValueValidator(1)])
+    created_at = models.DateTimeField(_('Created At'), auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at', '-id']
+        verbose_name = _('Cart Item')
+        verbose_name_plural = _('Cart Items')
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'resource'], name='unique_cart_item_per_user'),
+        ]
+
+    def __str__(self):
+        return f'{self.quantity} × {self.resource}'
+
+    def get_cost(self):
+        return self.resource.price_per_hour * self.quantity

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Booking, Order, OrderItem
+from .models import Booking, CartItem, Order, OrderItem
 
 
 @admin.register(Booking)
@@ -23,3 +23,10 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('paid', 'created_at')
     search_fields = ('first_name', 'last_name', 'email')
     inlines = [OrderItemInline]
+
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'resource', 'quantity', 'created_at')
+    raw_id_fields = ['user', 'resource']
+    list_select_related = ('user', 'resource')

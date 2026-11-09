@@ -665,3 +665,12 @@ msgstr "Мова"
 #: templates/base.html:83
 msgid "Close"
 msgstr "Закрити"
+
+msgid "Cart Item"
+msgstr "Позиція кошика"
+
+msgid "Cart Items"
+msgstr "Позиції кошика"
+
+msgid "This booking cannot be cancelled."
+msgstr "Це бронювання неможливо скасувати."
