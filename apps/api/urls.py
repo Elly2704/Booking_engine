@@ -1,13 +1,20 @@
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from rest_framework.routers import DefaultRouter
+from rest_framework.permissions import AllowAny
+from rest_framework.routers import APIRootView, DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 from . import views
 
 app_name = 'api'
 
+
+class PublicAPIRootView(APIRootView):
+    permission_classes = [AllowAny]
+
+
 router = DefaultRouter()
+router.APIRootView = PublicAPIRootView
 router.register('categories', views.ResourceCategoryViewSet, basename='category')
 router.register('resources', views.ResourceViewSet, basename='resource')
 router.register('bookings', views.BookingViewSet, basename='booking')

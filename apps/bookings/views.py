@@ -1,4 +1,5 @@
 import logging
+from functools import partial
 
 import stripe
 from asgiref.sync import sync_to_async
@@ -14,6 +15,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import CreateView, ListView, UpdateView
@@ -21,9 +23,9 @@ from django.views.generic import CreateView, ListView, UpdateView
 from apps.resources.models import Resource
 
 from .cart import Cart
-from .emails import send_order_confirmation_email
 from .forms import BookingForm, CheckoutForm
 from .models import Booking, Order, OrderItem
+from .tasks import send_order_confirmation
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -213,7 +215,8 @@ def payment_success(request):
     """Confirm the payment with Stripe and mark the order as paid exactly once.
 
     The order row is locked with ``select_for_update`` so parallel requests cannot
-    confirm it twice, and the email is sent only after the transaction commits.
+    confirm it twice, and the email task is queued only after the transaction commits;
+    a broker failure is logged and never breaks the confirmation page.
     """
     order_id = request.GET.get('order_id')
     session_id = request.GET.get('session_id')
@@ -240,7 +243,7 @@ def payment_success(request):
         if not order.paid:
             order.paid = True
             order.save(update_fields=['paid', 'updated_at'])
-            transaction.on_commit(lambda: send_order_confirmation_email(order))
+            transaction.on_commit(partial(send_order_confirmation.delay, order.id, get_language()), robust=True)
 
     Cart(request).clear()
     return render(request, 'bookings/success.html', {'order': order})

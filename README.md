@@ -14,7 +14,10 @@ The interface is available in **Ukrainian and English**.
 - **Async views** using the async ORM: availability check API, booking statistics API, order details, category statistics
 - **Internationalization**: Ukrainian (default) and English with a language switcher
 - **REST API** on Django REST Framework: JWT auth, pagination, filtering, throttling, Swagger docs, CORS
-- **Tests**: 229 pytest tests with ~99% coverage, Stripe and email are mocked
+- **Caching** in Redis: API view cache, template fragments and low-level resource cache, invalidated by signals
+- **Background jobs**: Celery for confirmation emails, daily reports and session cleanup, scheduled by Celery Beat
+- **Production stack**: NGINX reverse proxy and static files, Gunicorn, Sentry error monitoring
+- **Tests**: 274 pytest tests with ~99% coverage, Stripe and email are mocked
 
 ## Tech stack
 
@@ -22,10 +25,12 @@ The interface is available in **Ukrainian and English**.
 |---|---|
 | Backend | Python 3.12, Django 6.1 |
 | Database | PostgreSQL 16 |
+| Cache and broker | Redis 7 |
+| Background jobs | Celery, Celery Beat |
 | Payments | Stripe Checkout |
 | API | Django REST Framework, Simple JWT, django-filter, drf-spectacular, django-cors-headers |
 | Frontend | Django templates, Bootstrap 5 |
-| Infrastructure | Docker, Docker Compose |
+| Infrastructure | Docker, Docker Compose, NGINX, Gunicorn, Sentry |
 | Testing | pytest, pytest-django, pytest-cov, factory-boy |
 
 ## Getting started
@@ -37,7 +42,8 @@ cp .env.example .env        # then set SECRET_KEY and your Stripe test keys
 docker compose up --build
 ```
 
-Migrations run automatically on start. Open <http://localhost:8000>.
+Migrations and `collectstatic` run automatically on start. Open <http://localhost:8000>.
+The source code is baked into the image, so rebuild with `docker compose up --build -d` after code changes.
 
 ```bash
 docker compose exec web python manage.py createsuperuser
@@ -48,7 +54,7 @@ Demo users created by `seed_data` use the password `StrongPass123!`.
 
 ### Locally
 
-Requires Python 3.12 and a running PostgreSQL.
+Requires Python 3.12, a running PostgreSQL and Redis.
 
 ```bash
 python -m venv .venv
@@ -57,6 +63,8 @@ pip install -r requirements-dev.txt
 cp .env.example .env
 python manage.py migrate
 python manage.py runserver
+celery -A config worker --loglevel=info   # background jobs, in a separate terminal
+celery -A config beat --loglevel=info     # periodic jobs, in a separate terminal
 ```
 
 ### Environment variables
@@ -70,6 +78,13 @@ python manage.py runserver
 | `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` | PostgreSQL connection | `booking_db`, `postgres`, empty, `localhost`, `5432` |
 | `STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY` | Stripe test keys | empty |
 | `STRIPE_CURRENCY` | Checkout currency | `usd` |
+| `REDIS_URL` | Redis server, without a database number (cache uses db 1, Celery uses db 0) | `redis://localhost:6379` |
+| `EMAIL_BACKEND`, `DEFAULT_FROM_EMAIL` | Outgoing mail | console backend, `noreply@bookingengine.com` |
+| `SENTRY_DSN` | Sentry project; monitoring is off when empty | empty |
+| `SENTRY_ENVIRONMENT`, `SENTRY_TRACES_SAMPLE_RATE` | Sentry environment name and tracing share | `development`, `0.1` |
+| `NUM_PROXIES` | Reverse proxies in front of the app, used by throttling (Compose sets it to 1) | `0` |
+| `HTTP_PORT` | Compose: public NGINX port | `8000` |
+| `DB_PUBLISHED_PORT` | Compose: PostgreSQL port on `127.0.0.1` of the host | `5433` |
 
 For test payments use the Stripe card `4242 4242 4242 4242` with any future date and CVC.
 
@@ -98,7 +113,8 @@ apps/
 ├── resources/    categories and resources, catalogue, CRUD, statistics
 ├── bookings/     bookings, cart, orders, Stripe checkout, emails, async API, seed_data
 └── api/          REST API: serializers, viewsets, filters, permissions, routes
-config/           settings and URL configuration
+config/           settings, URL configuration, Celery app
+nginx/            reverse proxy configuration
 locale/           uk and en translations
 templates/        base layout
 static/           styles
@@ -147,6 +163,20 @@ curl localhost:8000/api/bookings/ -H 'Authorization: Bearer <access>'
 | `/api/users/`, `/api/users/me/` | authenticated | Users see only themselves, staff see everyone; `me` supports `PATCH` |
 
 The API cart is stored in the database per user, because JWT clients have no session; it is separate from the session cart of the website.
+
+## Infrastructure
+
+`docker compose up` starts `db`, `redis`, `web` (Gunicorn), `celery`, `celery-beat` and `nginx`. NGINX is the only public entry point: it serves `/static/` and `/media/` and proxies everything else to Gunicorn.
+
+**Caching.** Public API lists use the view cache, resource cards on the catalogue page use template fragments, and the resource page uses the low-level cache. All keys include a catalog version; saving or deleting a resource or a category replaces that version through signals after the transaction commits.
+
+**Celery tasks** (`apps/bookings/tasks.py`):
+
+| Task | When |
+|---|---|
+| `send_order_confirmation` | After a payment is confirmed, in the customer's language, with retries on mail errors |
+| `generate_daily_report` | Daily at 00:30 UTC, writes `reports/report_<date>.csv` |
+| `clear_expired_sessions` | Daily at 03:00 UTC |
 
 ## Translations
 

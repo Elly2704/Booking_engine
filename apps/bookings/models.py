@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -71,8 +71,11 @@ class Booking(models.Model):
                 raise ValidationError(_('This resource is already booked for the selected time period.'))
 
     def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
+        with transaction.atomic():
+            # Lock the resource so that concurrent requests cannot both pass the overlap check.
+            Resource.objects.select_for_update().filter(pk=self.resource_id).first()
+            self.full_clean()
+            super().save(*args, **kwargs)
 
     @property
     def is_cancellable(self):
@@ -82,14 +85,14 @@ class Booking(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='orders',
         null=True,
         blank=True,
         verbose_name=_('User'),
     )
     first_name = models.CharField(_('First Name'), max_length=50)
-    last_name = models.CharField(_('Last Name'), max_length=50)
+    last_name = models.CharField(_('Last Name'), max_length=50, blank=True)
     email = models.EmailField(_('Email'))
     created_at = models.DateTimeField(_('Created At'), auto_now_add=True)
     updated_at = models.DateTimeField(_('Updated At'), auto_now=True)
