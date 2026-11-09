@@ -150,7 +150,7 @@ def test_create_order_requires_contacts(user_client, user):
     CartItemFactory(user=user)
     response = user_client.post(ORDERS_URL, {'first_name': 'Ann'})
     assert response.status_code == 400
-    assert {'last_name', 'email'} <= set(response.data)
+    assert set(response.data) == {'email'}
 
 
 def test_client_cannot_mark_order_as_paid(user_client, order):

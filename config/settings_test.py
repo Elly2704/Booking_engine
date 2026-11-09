@@ -1,6 +1,7 @@
 import os
 
 os.environ.setdefault('SECRET_KEY', 'test-secret-key-at-least-32-bytes-long')
+os.environ['SENTRY_DSN'] = ''
 
 from .settings import *
 
@@ -15,6 +16,11 @@ DATABASES = {
         'NAME': ':memory:',
     }
 }
+
+CACHES = {'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}}
+
+CELERY_BROKER_URL = 'memory://'
+CELERY_TASK_ALWAYS_EAGER = True
 
 PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher']
 

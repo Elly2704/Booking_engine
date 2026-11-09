@@ -665,3 +665,9 @@ msgstr "Cart Items"
 
 msgid "This booking cannot be cancelled."
 msgstr "This booking cannot be cancelled."
+
+msgid "This slug is reserved."
+msgstr "This slug is reserved."
+
+msgid "Only upcoming bookings can be changed."
+msgstr "Only upcoming bookings can be changed."

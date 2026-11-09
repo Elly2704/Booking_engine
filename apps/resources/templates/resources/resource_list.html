@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n cache %}
 
 {% block title %}{% translate "Resource List" %}{% endblock %}
 
@@ -34,12 +34,14 @@
     {% for resource in resources %}
         <div class="col-md-4 mb-3">
             <div class="card card-hover h-100">
+                {% cache 900 resource_card resource.pk catalog_version LANGUAGE_CODE %}
                 <div class="card-body">
                     <span class="badge bg-light text-secondary mb-2">{{ resource.category.name }}</span>
                     <h5 class="card-title">{{ resource.name }}</h5>
                     <p class="card-text">{{ resource.description|truncatewords:10 }}</p>
                     <p class="fw-bold">{% blocktranslate with price=resource.price_per_hour %}${{ price }}/hr{% endblocktranslate %}</p>
                 </div>
+                {% endcache %}
                 <div class="card-footer">
                     <a href="{% url 'resources:resource_detail' slug=resource.slug %}" class="btn btn-sm btn-info text-white">{% translate "View" %}</a>
                     {% if perms.resources.change_resource %}

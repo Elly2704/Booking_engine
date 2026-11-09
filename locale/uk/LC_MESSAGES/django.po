@@ -674,3 +674,9 @@ msgstr "Позиції кошика"
 
 msgid "This booking cannot be cancelled."
 msgstr "Це бронювання неможливо скасувати."
+
+msgid "This slug is reserved."
+msgstr "Цей slug зарезервовано."
+
+msgid "Only upcoming bookings can be changed."
+msgstr "Змінювати можна лише майбутні бронювання."

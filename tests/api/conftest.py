@@ -1,5 +1,4 @@
 import pytest
-from django.core.cache import cache
 from rest_framework.test import APIClient
 
 from tests.factories import UserFactory
@@ -9,12 +8,6 @@ def _client_for(user):
     client = APIClient()
     client.force_authenticate(user)
     return client
-
-
-@pytest.fixture(autouse=True)
-def _reset_throttling():
-    """Throttle counters live in the cache and must not leak between tests."""
-    cache.clear()
 
 
 @pytest.fixture

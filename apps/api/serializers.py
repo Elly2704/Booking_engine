@@ -8,6 +8,7 @@ from rest_framework.settings import api_settings
 
 from apps.bookings.models import Booking, CartItem, Order, OrderItem
 from apps.resources.models import Resource, ResourceCategory
+from apps.users.forms import MAX_AVATAR_SIZE
 
 User = get_user_model()
 
@@ -25,6 +26,11 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'avatar']
         read_only_fields = ['id', 'username']
+
+    def validate_avatar(self, avatar):
+        if avatar and avatar.size > MAX_AVATAR_SIZE:
+            raise serializers.ValidationError(_('File size must be less than 2 MB.'))
+        return avatar
 
 
 class ResourceCategorySerializer(serializers.ModelSerializer):
@@ -76,6 +82,11 @@ class BookingSerializer(serializers.ModelSerializer):
             'status', 'is_cancellable', 'created_at',
         ]
         read_only_fields = ['id', 'user', 'status', 'created_at']
+
+    def validate(self, attrs):
+        if self.instance and not self.instance.is_cancellable:
+            raise serializers.ValidationError(_('Only upcoming bookings can be changed.'))
+        return attrs
 
     def save(self, **kwargs):
         try:

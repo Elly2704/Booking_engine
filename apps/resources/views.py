@@ -1,10 +1,12 @@
 from asgiref.sync import sync_to_async
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Avg, Count, Q
+from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
+from .cache import get_catalog_version, get_resource_detail
 from .forms import ResourceForm
 from .models import Resource, ResourceCategory
 
@@ -32,6 +34,7 @@ class ResourceListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = ResourceCategory.objects.all()
+        context['catalog_version'] = get_catalog_version()
         return context
 
 
@@ -39,8 +42,11 @@ class ResourceDetailView(DetailView):
     template_name = 'resources/resource_detail.html'
     context_object_name = 'resource'
 
-    def get_queryset(self):
-        return Resource.objects.filter(is_active=True).select_related('category')
+    def get_object(self, queryset=None):
+        resource = get_resource_detail(self.kwargs['slug'])
+        if resource is None:
+            raise Http404
+        return resource
 
 
 class ResourceCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):

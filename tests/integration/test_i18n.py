@@ -3,7 +3,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils import translation
 
-from apps.bookings.views import send_order_confirmation_email
+from apps.bookings.emails import send_order_confirmation_email
 
 pytestmark = pytest.mark.django_db
 

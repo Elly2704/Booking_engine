@@ -3,6 +3,7 @@ from unittest import mock
 
 import pytest
 from django.contrib.auth.models import Permission
+from django.core.cache import cache
 from django.utils import translation
 
 from tests.factories import (
@@ -20,8 +21,15 @@ PASSWORD = 'StrongPass123!'
 @pytest.fixture(autouse=True)
 def _media_and_language(settings, tmp_path):
     settings.MEDIA_ROOT = tmp_path / 'media'
+    settings.REPORTS_DIR = tmp_path / 'reports'
     with translation.override('en'):
         yield
+
+
+@pytest.fixture(autouse=True)
+def _clear_cache():
+    """Cached pages, resources and throttle counters must not leak between tests."""
+    cache.clear()
 
 
 @pytest.fixture

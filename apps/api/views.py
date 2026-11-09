@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
+from django.views.decorators.vary import vary_on_headers
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers as drf_serializers
 from rest_framework import status, viewsets
@@ -9,6 +11,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from apps.bookings.models import Booking, CartItem, Order
+from apps.resources.cache import cache_catalog_page
 from apps.resources.models import Resource, ResourceCategory
 
 from . import serializers
@@ -23,6 +26,12 @@ class PublicReadAdminWriteMixin:
         if self.action in ('list', 'retrieve'):
             return [AllowAny()]
         return [IsAdminUser()]
+
+    # Staff see inactive resources and browsers get HTML, so the cache must vary on both headers.
+    @method_decorator(cache_catalog_page)
+    @method_decorator(vary_on_headers('Authorization', 'Accept'))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class OwnedQuerysetMixin:

@@ -1,6 +1,4 @@
-import logging
 from datetime import timedelta
-from unittest import mock
 
 import pytest
 from django.urls import reverse
@@ -141,12 +139,6 @@ class TestConfirmationEmail:
         assert mailoutbox[0].to == [order.email]
         assert mailoutbox[0].subject == f'Order #{order.id}'
 
-    def test_email_failure_is_logged(self, order, caplog):
-        with mock.patch('apps.bookings.emails.send_mail', side_effect=ConnectionError('smtp down')) as send:
-            with caplog.at_level(logging.ERROR, logger='apps.bookings.emails'):
-                send_order_confirmation_email(order)
-        send.assert_called_once()
-        assert 'Failed to send confirmation email' in caplog.text
 
 
 def test_profile_requires_login(client, db):

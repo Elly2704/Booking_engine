@@ -1,8 +1,12 @@
 from datetime import timedelta
 from pathlib import Path
 
+import sentry_sdk
 from decouple import Csv, config
+from celery.schedules import crontab
 from django.utils.translation import gettext_lazy as _
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -99,10 +103,37 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+REPORTS_DIR = BASE_DIR / 'reports'
+
+REDIS_URL = config('REDIS_URL', default='redis://localhost:6379')
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': f'{REDIS_URL}/1',
+    },
+}
+
+CELERY_BROKER_URL = f'{REDIS_URL}/0'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_TASK_IGNORE_RESULT = True
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_BEAT_SCHEDULE = {
+    'generate-daily-report': {
+        'task': 'apps.bookings.tasks.generate_daily_report',
+        'schedule': crontab(hour=0, minute=30),
+    },
+    'clear-expired-sessions': {
+        'task': 'apps.bookings.tasks.clear_expired_sessions',
+        'schedule': crontab(hour=3, minute=0),
+    },
+}
 
 CART_SESSION_ID = 'cart'
 
@@ -129,6 +160,8 @@ REST_FRAMEWORK = {
         'user': '1000/hour',
     },
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # Number of reverse proxies in front of the app: throttling must not trust a client-supplied X-Forwarded-For.
+    'NUM_PROXIES': config('NUM_PROXIES', default=0, cast=int),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
@@ -159,6 +192,16 @@ MAILERS = {
     },
 }
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@bookingengine.com')
+
+SENTRY_DSN = config('SENTRY_DSN', default='')
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration(), CeleryIntegration()],
+        environment=config('SENTRY_ENVIRONMENT', default='development'),
+        traces_sample_rate=config('SENTRY_TRACES_SAMPLE_RATE', default=0.1, cast=float),
+        send_default_pii=False,
+    )
 
 LOGGING = {
     'version': 1,
