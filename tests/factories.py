@@ -4,7 +4,7 @@ from decimal import Decimal
 import factory
 from django.utils import timezone
 
-from apps.bookings.models import Booking, Order, OrderItem
+from apps.bookings.models import Booking, CartItem, Order, OrderItem
 from apps.resources.models import Resource, ResourceCategory
 from apps.users.models import User
 
@@ -80,4 +80,13 @@ class OrderItemFactory(factory.django.DjangoModelFactory):
     order = factory.SubFactory(OrderFactory)
     resource = factory.SubFactory(ResourceFactory)
     price = factory.LazyAttribute(lambda o: o.resource.price_per_hour)
+    quantity = 2
+
+
+class CartItemFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = CartItem
+
+    user = factory.SubFactory(UserFactory)
+    resource = factory.SubFactory(ResourceFactory)
     quantity = 2

@@ -656,3 +656,12 @@ msgstr ""
 #: templates/base.html:83
 msgid "Close"
 msgstr ""
+
+msgid "Cart Item"
+msgstr "Cart Item"
+
+msgid "Cart Items"
+msgstr "Cart Items"
+
+msgid "This booking cannot be cancelled."
+msgstr "This booking cannot be cancelled."
