@@ -35,8 +35,14 @@ class ResourceCategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'description', 'resources_count']
 
 
+class ResourceCategoryShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ResourceCategory
+        fields = ['id', 'name', 'slug']
+
+
 class ResourceSerializer(serializers.ModelSerializer):
-    category = ResourceCategorySerializer(read_only=True)
+    category = ResourceCategoryShortSerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
         queryset=ResourceCategory.objects.all(),
         source='category',

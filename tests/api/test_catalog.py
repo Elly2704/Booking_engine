@@ -55,7 +55,11 @@ def test_staff_can_delete_category(staff_client, category):
 
 def test_resource_list_nests_category(api_client, resource):
     row = api_client.get(RESOURCES_URL).data['results'][0]
-    assert row['category']['slug'] == resource.category.slug
+    assert row['category'] == {
+        'id': resource.category.pk,
+        'name': resource.category.name,
+        'slug': resource.category.slug,
+    }
     assert 'category_id' not in row
 
 
